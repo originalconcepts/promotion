@@ -1,0 +1,776 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Promotion Engine 0.4.2\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: he_IL\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Domain: promotion-engine\n"
+
+msgid "% / ₪ Discount"
+msgstr "% / ₪ הנחה"
+
+msgid "+ Create Promotion"
+msgstr "+ יצירת מבצע"
+
+msgid "+ Save Promotion"
+msgstr "+ שמירת מבצע"
+
+msgid "Permission denied."
+msgstr "אין הרשאה."
+
+msgid "Website"
+msgstr "אתר"
+
+msgid "In this version automatic promotions (no coupon) are applied at checkout. Coupon-code entry at checkout is coming next."
+msgstr "בגרסה זו מבצעים אוטומטיים (ללא קופון) מוחלים בקופה. החלת קוד קופון בקופה — בשלב הבא."
+
+msgid "Choose product type"
+msgstr "בחר סוג מוצרים"
+
+msgid "Select categories..."
+msgstr "בחר קטגוריות..."
+
+msgid "Cancel"
+msgstr "ביטול"
+
+msgid "On Sale"
+msgstr "במבצע"
+
+msgid "On orders over"
+msgstr "בקנייה מעל"
+
+msgid "In the standalone plugin the channel is the website. Additional channels (app/kiosk/POS) are managed through Giorgio."
+msgstr "בתוסף העצמאי הערוץ הוא האתר. ערוצים נוספים (אפליקציה/קיוסק/POS) מנוהלים דרך Giorgio."
+
+msgid "Limit (per customer)"
+msgstr "הגבל ל (ללקוח)"
+
+msgid "Limit (items)"
+msgstr "הגבל ל (פריטים)"
+
+msgid "Apply purchase condition"
+msgstr "החל תנאי קנייה"
+
+msgid "Require coupon code"
+msgstr "הכנס קוד קופון"
+
+msgid "Promotion saved."
+msgstr "המבצע נשמר."
+
+msgid "Discount of"
+msgstr "הנחה של"
+
+msgid "off"
+msgstr "הנחה"
+
+msgid "Show promotion label on the product in the catalog"
+msgstr "הצג תווית מבצע על המוצר בקטלוג"
+
+msgid "Applies to entire cart"
+msgstr "חל על כל הסל"
+
+msgid "You saved"
+msgstr "חסכת"
+
+msgid "Search products..."
+msgstr "חפש מוצרים..."
+
+msgid "Create Promotion — % / ₪ Discount"
+msgstr "יצירת מבצע — % / ₪ הנחה"
+
+msgid "Off"
+msgstr "כבוי"
+
+msgid "All products"
+msgstr "כל המוצרים"
+
+msgid "e.g. 20% off all frozen items"
+msgstr "לדוגמה: 20% הנחה על כל הקפואים"
+
+msgid "No limit"
+msgstr "ללא הגבלה"
+
+msgid "Delete this promotion?"
+msgstr "למחוק את המבצע?"
+
+msgid "This promotion is managed in Giorgio and is read-only here. To edit it, update it in Giorgio."
+msgstr "מבצע זה מנוהל ב-Giorgio ולכן הוא לקריאה בלבד כאן. לעריכה, עדכן אותו ב-Giorgio."
+
+msgid "Promotions"
+msgstr "מבצעים"
+
+msgid "What is the discount?"
+msgstr "מה ההנחה?"
+
+msgid "Excluded products"
+msgstr "מוצרים מוחרגים"
+
+msgid "Specific products"
+msgstr "מוצרים ספציפיים"
+
+msgid "Products to exclude..."
+msgstr "מוצרים שלא ייכללו..."
+
+msgid "Products"
+msgstr "מוצרים"
+
+msgid "Delete"
+msgstr "מחיקה"
+
+msgid "Local"
+msgstr "מקומי"
+
+msgid "Source"
+msgstr "מקור"
+
+msgid "When?"
+msgstr "מתי?"
+
+msgid "is required for this plugin to work."
+msgstr "נדרש כדי שהתוסף יפעל."
+
+msgid "Type"
+msgstr "סוג"
+
+msgid "Status"
+msgstr "סטטוס"
+
+msgid "Until %s"
+msgstr "עד %s"
+
+msgid "Until when? (optional)"
+msgstr "עד מתי? (אופציונלי)"
+
+msgid "No promotions yet. Create your first one."
+msgstr "עדיין אין מבצעים. צור את הראשון."
+
+msgid "Copy"
+msgstr "עותק"
+
+msgid "What does the promotion apply to?"
+msgstr "על מה חל המבצע?"
+
+msgid "Sales channel"
+msgstr "ערוץ מכירה"
+
+msgid "Edit"
+msgstr "עריכה"
+
+msgid "Edit Promotion"
+msgstr "עריכת מבצע"
+
+msgid "Actions"
+msgstr "פעולות"
+
+msgid "Active"
+msgstr "פעיל"
+
+msgid "Promotion details"
+msgstr "פרטי המבצע"
+
+msgid "items"
+msgstr "פריטים"
+
+msgid "Recurring by weekday"
+msgstr "קבוע לפי ימי השבוע"
+
+msgid "Coupon code"
+msgstr "קוד קופון"
+
+msgid "Specific categories"
+msgstr "קטגוריות ספציפיות"
+
+msgid "Categories"
+msgstr "קטגוריות"
+
+msgid "Buy X Get Y"
+msgstr "קנה X קבל Y"
+
+msgid "Buy X Pay Y"
+msgstr "קנה X שלם Y"
+
+msgid "Buy at least"
+msgstr "קנה לפחות"
+
+msgid "Duplicate"
+msgstr "שכפול"
+
+msgid "Promotion name"
+msgstr "שם המבצע"
+
+msgid "Validity"
+msgstr "תוקף"
+
+msgid "Scheduling"
+msgstr "תזמון"
+
+msgid "This coupon requires at least %d items in the cart."
+msgstr "הקופון דורש לפחות %d פריטים בסל."
+
+msgid "Discount applies to at most this many units; the rest stay full price. Leave empty for no limit."
+msgstr "ההנחה חלה על עד מספר זה של יחידות; השאר במחיר מלא. השאירו ריק לללא הגבלה."
+
+msgid "How many times a single customer can use this promotion in total (across orders). Leave empty for no limit."
+msgstr "כמה פעמים לקוח בודד יכול לנצל את המבצע בסך הכל (על פני הזמנות). השאירו ריק לללא הגבלה."
+
+msgid "% off"
+msgstr "% הנחה"
+
+msgid "Benefit product(s) — the customer gets one of these"
+msgstr "מוצר/י ההטבה — הלקוח מקבל אחד מהם"
+
+msgid "Benefit type"
+msgstr "סוג ההטבה"
+
+msgid "Buy"
+msgstr "קנה"
+
+msgid "Buy %1$s for %2$s"
+msgstr "קנה %1$s ב-%2$s"
+
+msgid "Buy & get %s%% off"
+msgstr "קנה וקבל %s%% הנחה"
+
+msgid "Buy & get a gift"
+msgstr "קנה וקבל מתנה"
+
+msgid "Buy & get a special price"
+msgstr "קנה וקבל מחיר מיוחד"
+
+msgid "Buy a product and get a gift or a discount on another."
+msgstr "קנה מוצר וקבל מתנה או הנחה על מוצר אחר."
+
+msgid "Buy a quantity for a fixed price. E.g. 3 kg for ₪100."
+msgstr "קנה כמות במחיר קבוע. למשל: 3 ק\"ג ב-₪100."
+
+msgid "Choose promotion type"
+msgstr "בחר סוג מבצע"
+
+msgid "Create Promotion — Buy X Get Y"
+msgstr "יצירת מבצע — קנה X קבל Y"
+
+msgid "Create Promotion — Buy X Pay Y"
+msgstr "יצירת מבצע — קנה X שלם Y"
+
+msgid "Discount on products, categories, or the whole order."
+msgstr "הנחה על מוצרים, קטגוריות, או סך ההזמנה."
+
+msgid "Fixed price"
+msgstr "מחיר קבוע"
+
+msgid "Free"
+msgstr "חינם"
+
+msgid "How many benefit units per order. Defaults to 1 if empty."
+msgstr "כמה יחידות הטבה בכל הזמנה. ברירת מחדל 1 אם ריק."
+
+msgid "How many times this deal can repeat in a single order. Leave empty for no limit."
+msgstr "כמה פעמים העסקה יכולה לחזור באותה הזמנה. השאירו ריק לללא הגבלה."
+
+msgid "Limit (per order)"
+msgstr "הגבל ל (להזמנה)"
+
+msgid "Limits"
+msgstr "הגבלות"
+
+msgid "Promotion rule"
+msgstr "חוקיות המבצע"
+
+msgid "The benefit applies when this product is in the cart. (Auto-adding a free gift comes in a later phase.)"
+msgstr "ההטבה חלה כשהמוצר נמצא בסל. (הוספת מתנה אוטומטית בשלב הבא.)"
+
+msgid "What the customer gets"
+msgstr "מה הלקוח מקבל"
+
+msgid "What the customer must buy"
+msgstr "מה הלקוח צריך לקנות"
+
+msgid "a category"
+msgstr "קטגוריה"
+
+msgid "a product"
+msgstr "מוצר"
+
+msgid "and pay (total)"
+msgstr "ושלם (סה\"כ)"
+
+msgid "from"
+msgstr "מתוך"
+
+msgid "qty (kg / units)"
+msgstr "כמות (ק\"ג / יח׳)"
+
+msgid "You saved on this purchase"
+msgstr "חסכת בקניה זו"
+
+msgid "Applied promotions"
+msgstr "מבצעים שחלים"
+
+msgid "Giorgio Sync"
+msgstr "סנכרון Giorgio"
+
+msgid "Not allowed."
+msgstr "אין הרשאה."
+
+msgid "Settings saved."
+msgstr "ההגדרות נשמרו."
+
+msgid "Connect this store to a Giorgio account. Promotions defined in Giorgio are pushed here and shown on the store; redemptions on the store are reported back to Giorgio for the unified dashboard."
+msgstr "חברו את החנות לחשבון Giorgio. מבצעים שמוגדרים ב-Giorgio נדחפים לכאן ומוצגים בחנות; מימושים בחנות מדווחים חזרה ל-Giorgio עבור הדשבורד המאוחד."
+
+msgid "Enable sync"
+msgstr "הפעל סנכרון"
+
+msgid "Sync promotions and report redemptions to Giorgio"
+msgstr "סנכרן מבצעים ודווח מימושים ל-Giorgio"
+
+msgid "Giorgio API base URL"
+msgstr "כתובת בסיס ל-API של Giorgio"
+
+msgid "API key (plugin &rarr; Giorgio)"
+msgstr "מפתח API (תוסף ⟵ Giorgio)"
+
+msgid "Sent as a Bearer token when the plugin calls Giorgio."
+msgstr "נשלח כ-Bearer token כשהתוסף פונה ל-Giorgio."
+
+msgid "Inbound (Giorgio &rarr; plugin)"
+msgstr "נכנס (Giorgio ⟵ תוסף)"
+
+msgid "Give these two values to your Giorgio developer so Giorgio can push promotion definitions into this store."
+msgstr "מסרו את שני הערכים האלה למפתח של Giorgio כדי ש-Giorgio יוכל לדחוף הגדרות מבצעים לחנות."
+
+msgid "Webhook URL"
+msgstr "כתובת Webhook"
+
+msgid "Webhook secret"
+msgstr "סוד Webhook"
+
+msgid "Giorgio must send this in the X-Promeng-Secret header."
+msgstr "Giorgio חייב לשלוח זאת בכותרת X-Promeng-Secret."
+
+msgid "Regenerate on save"
+msgstr "צור מחדש בשמירה"
+
+msgid "Last usage report"
+msgstr "דיווח מימושים אחרון"
+
+msgid "Save settings"
+msgstr "שמור הגדרות"
+
+msgid "Invalid or missing secret."
+msgstr "סוד שגוי או חסר."
+
+msgid "Expected a JSON body."
+msgstr "נדרש גוף JSON."
+
+msgid "external_id is required."
+msgstr "נדרש external_id."
+
+msgid "Unknown promotion type."
+msgstr "סוג מבצע לא מוכר."
+
+msgid "Giorgio sync is not enabled."
+msgstr "סנכרון Giorgio אינו מופעל."
+
+msgid "Add %1$s more to get the deal: %2$s"
+msgstr "הוסיפו עוד %1$s כדי לקבל את המבצע: %2$s"
+
+msgid "Add %1$s more for another deal: %2$s"
+msgstr "הוסיפו עוד %1$s כדי לקבל מבצע נוסף: %2$s"
+
+msgid "Add %1$s more to unlock: %2$s"
+msgstr "הוסיפו עוד %1$s כדי לפתוח: %2$s"
+
+msgid "Add %1$s more to get: %2$s"
+msgstr "הוסיפו עוד %1$s כדי לקבל: %2$s"
+
+msgid "You unlocked %s — add the offer item to your cart to claim it."
+msgstr "פתחתם את %s — הוסיפו את פריט ההטבה לסל כדי לממש."
+
+msgid "Cap on benefit units per order. Leave empty to earn one benefit each time the buy condition is met."
+msgstr "תקרה ליחידות הטבה בכל הזמנה. השאירו ריק כדי לזכות בהטבה אחת בכל פעם שתנאי הקנייה מתקיים."
+
+msgid "Quantity to buy (X)"
+msgstr "כמות לקנייה (X)"
+
+msgid "How many qualifying products earn one benefit. The deal repeats — buy twice as many to earn two benefits."
+msgstr "כמה מוצרים מזכים בהטבה אחת. המבצע חוזר על עצמו — קנו פי שניים כדי לזכות בשתי הטבות."
+
+msgid "Require a minimum order amount"
+msgstr "דרוש סכום הזמנה מינימלי"
+
+msgid "Add %1$d more item to unlock: %2$s"
+msgid_plural "Add %1$d more items to unlock: %2$s"
+msgstr[0] "הוסיפו עוד פריט %1$d כדי לפתוח: %2$s"
+msgstr[1] "הוסיפו עוד %1$d פריטים כדי לפתוח: %2$s"
+
+msgid "Add %1$d more item to get: %2$s"
+msgid_plural "Add %1$d more items to get: %2$s"
+msgstr[0] "הוסיפו עוד פריט %1$d כדי לקבל: %2$s"
+msgstr[1] "הוסיפו עוד %1$d פריטים כדי לקבל: %2$s"
+
+
+msgid "Free gift"
+msgstr "מתנה"
+
+msgid "The benefit applies to this product. With \"Free\" you can add it to the cart automatically (below)."
+msgstr "ההטבה חלה על מוצר זה. עם \"חינם\" אפשר להוסיף אותו לסל אוטומטית (למטה)."
+
+msgid "Add the free product to the cart automatically"
+msgstr "הוסף את המוצר החינמי לסל אוטומטית"
+
+msgid "When the customer qualifies, the free product is added for them. Turn off to only discount it if they add it themselves."
+msgstr "כשהלקוח זכאי, המוצר החינמי יתווסף לו אוטומטית. כבה כדי רק להנחות אותו אם הלקוח מוסיף אותו בעצמו."
+
+msgid "The promotion applies only when the customer enters this code at the cart or checkout."
+msgstr "המבצע חל רק כשהלקוח מזין את הקוד בעגלה או בקופה."
+
+msgid "Created"
+msgstr "תאריך יצירה"
+
+msgid "Redemptions"
+msgstr "מס׳ מימושים"
+
+msgid "Total revenue"
+msgstr "סה״כ הכנסות"
+
+msgid "Automatic"
+msgstr "אוטומטי"
+
+msgid "Buy %1$s, pay for %2$s"
+msgstr "קנה %1$s, שלם על %2$s"
+
+msgid "Buy %d, get a benefit"
+msgstr "קנה %d, קבל הטבה"
+
+msgid "Coupon"
+msgstr "קופון"
+
+msgid "Entire order"
+msgstr "הזמנה כולה"
+
+msgid "Name"
+msgstr "שם"
+
+msgid "Offer"
+msgstr "הטבה"
+
+msgid "Summary"
+msgstr "סיכום המבצע"
+
+msgid "%1$s%% off %2$s"
+msgstr "%1$s%% הנחה על %2$s"
+
+msgid "%1$s off %2$s"
+msgstr "%1$s הנחה על %2$s"
+
+msgid "all products"
+msgstr "כל המוצרים"
+
+msgid "selected products"
+msgstr "מוצרים נבחרים"
+
+msgid "the %s category"
+msgstr "קטגוריית %s"
+
+msgid "the entire order"
+msgstr "כל ההזמנה"
+
+msgid "Buy %1$s → pay %2$s"
+msgstr "קנה %1$s ← שלם %2$s"
+
+msgid "Spend %1$s → get %2$s"
+msgstr "קנה %1$s ← קבל %2$s"
+
+msgid "Buy %1$s → get %2$s"
+msgstr "קנה %1$s ← קבל %2$s"
+
+msgid "free"
+msgstr "חינם"
+
+msgid "for %s"
+msgstr "ב-%s"
+
+msgid "at %s%% off"
+msgstr "ב-%s%% הנחה"
+
+msgid "%s items"
+msgstr "%s פריטים"
+
+msgid "Applies to %s"
+msgstr "חל על %s"
+
+msgid "Excludes: %s"
+msgstr "לא כולל: %s"
+
+msgid "Coupon code:"
+msgstr "קוד קופון:"
+
+msgid "Active from today, no end date"
+msgstr "פעיל מהיום, ללא תאריך סיום"
+
+msgid "Active until %s"
+msgstr "פעיל עד %s"
+
+msgid "Active from %s"
+msgstr "פעיל מ-%s"
+
+msgid "Active %1$s – %2$s"
+msgstr "פעיל %1$s – %2$s"
+
+msgid "on %s"
+msgstr "בימים %s"
+
+msgid "Limited to one purchase per customer"
+msgstr "מוגבל לקנייה אחת ללקוח"
+
+msgid "Limited to %d purchases per customer"
+msgstr "מוגבל ל-%d קניות ללקוח"
+
+msgid "Available on all sales channels"
+msgstr "זמין בכל ערוצי המכירה"
+
+msgid "Sun"
+msgstr "א׳"
+
+msgid "Mon"
+msgstr "ב׳"
+
+msgid "Tue"
+msgstr "ג׳"
+
+msgid "Wed"
+msgstr "ד׳"
+
+msgid "Thu"
+msgstr "ה׳"
+
+msgid "Fri"
+msgstr "ו׳"
+
+msgid "Sat"
+msgstr "ש׳"
+
+msgid "Fill in the form to see the summary…"
+msgstr "מלא את הטופס כדי לראות את הסיכום…"
+
+msgid "Promotion summary"
+msgstr "סיכום מבצע"
+
+msgid "The summary updates live as you fill in the form."
+msgstr "הסיכום מתעדכן בזמן אמת לפי בחירותיך בטופס."
+
+msgid "Create promotion"
+msgstr "יצירת מבצע"
+
+msgid "Save promotion"
+msgstr "שמירת מבצע"
+
+msgid "Buy %1$s %2$s, pay %3$s"
+msgstr "קנה %1$s %2$s ושלם %3$s"
+
+msgid "On orders over %s"
+msgstr "בקנייה מעל %s"
+
+msgid "On a purchase of at least %s items"
+msgstr "בקנייה של לפחות %s פריטים"
+
+msgid "The free product is added to the cart automatically"
+msgstr "המוצר החינמי מתווסף לסל אוטומטית"
+
+msgid "Up to %s redemptions per order"
+msgstr "עד %s מימושים בהזמנה"
+
+msgid "Discount applies to up to %s items"
+msgstr "ההנחה חלה על עד %s פריטים"
+
+msgid "Influencer (OC Influencer Dashboard)"
+msgstr "משפיען (OC Influencer Dashboard)"
+
+msgid "Assigned influencer"
+msgstr "משפיען משויך"
+
+msgid "Search by name or email…"
+msgstr "חיפוש לפי שם או אימייל…"
+
+msgid "Commission percentage (%)"
+msgstr "אחוז עמלה (%)"
+
+msgid "Commission payout"
+msgstr "אופן תשלום העמלה"
+
+msgid "Store default"
+msgstr "ברירת מחדל של החנות"
+
+msgid "Reward points (YITH)"
+msgstr "נקודות צבירה (YITH)"
+
+msgid "Cash (money)"
+msgstr "מזומן (כסף)"
+
+msgid "Purchases made with this coupon code are counted for the influencer in the OC Influencer Dashboard."
+msgstr "רכישות עם קוד הקופון הזה נספרות עבור המשפיען ב-OC Influencer Dashboard."
+
+msgid "Web"
+msgstr "אתר"
+
+msgid "App"
+msgstr "אפליקציה"
+
+msgid "POS"
+msgstr "קופה"
+
+msgid "Kiosk"
+msgstr "קיוסק"
+
+msgid "Selected products"
+msgstr "מוצרים נבחרים"
+
+msgid "From %s"
+msgstr "מ-%s"
+
+msgid "Ended"
+msgstr "הסתיים"
+
+msgid "Ends today!"
+msgstr "מסתיים היום!"
+
+msgid "All"
+msgstr "הכל"
+
+msgid "Scheduled"
+msgstr "מתוזמנים"
+
+msgid "Drafts"
+msgstr "טיוטות"
+
+msgid "All time"
+msgstr "כל הזמן"
+
+msgid "This month"
+msgstr "החודש"
+
+msgid "Last month"
+msgstr "חודש שעבר"
+
+msgid "Last 7 days"
+msgstr "7 ימים אחרונים"
+
+msgid "Active promotions"
+msgstr "מבצעים פעילים"
+
+msgid "Revenue with a promotion"
+msgstr "הכנסות עם מבצע"
+
+msgid "%d%% of total revenue"
+msgstr "%d%% מכלל ההכנסות"
+
+msgid "Discounts given"
+msgstr "הנחות שניתנו"
+
+msgid "Promotion ROI"
+msgstr "תשואת מבצעים"
+
+msgid "per %s of discount given"
+msgstr "על כל %s הנחה שניתן"
+
+msgid "All channels"
+msgstr "כל הערוצים"
+
+msgid "Type: all"
+msgstr "סוג מבצע: הכל"
+
+msgid "Search promotion or category…"
+msgstr "חיפוש מבצע או קטגוריה…"
+
+msgid "Promotion"
+msgstr "שם המבצע"
+
+msgid "Channel"
+msgstr "ערוץ"
+
+msgid "Applies to"
+msgstr "חל על"
+
+msgid "Revenue"
+msgstr "הכנסות"
+
+msgid "Discounts"
+msgstr "הנחות"
+
+msgid "No promotions match your filters."
+msgstr "אין מבצעים שתואמים את הסינון."
+
+msgid "Showing %1$s–%2$s of %3$s"
+msgstr "מציג %1$s–%2$s מתוך %3$s"
+
+msgid "%d day left"
+msgid_plural "%d days left"
+msgstr[0] "נותר יום אחד"
+msgstr[1] "נותרו %d ימים"
+
+msgid "%d ending this week"
+msgid_plural "%d ending this week"
+msgstr[0] "%d מסתיים השבוע"
+msgstr[1] "%d מסתיימים השבוע"
+
+msgid "%s order"
+msgid_plural "%s orders"
+msgstr[0] "%s הזמנה"
+msgstr[1] "%s הזמנות"
+
+msgid "This promotion ended on %s and no longer applies"
+msgstr "המבצע הסתיים בתאריך %s ולכן אינו חל יותר"
+
+msgid "Get"
+msgstr "קבל"
+
+msgid "How many units the customer receives each time the buy condition is met (e.g. Buy 4, Get 2)."
+msgstr "כמה יחידות הלקוח מקבל בכל פעם שתנאי הקנייה מתקיים (לדוגמה: קנה 4 קבל 2)."
+
+msgid "Benefit categories"
+msgstr "קטגוריות ההטבה"
+
+msgid "the same items they buy"
+msgstr "אותם מוצרים שהוא קונה"
+
+msgid "The benefit applies to the same products/categories chosen in \"What the customer must buy\" above — ideal for 5+1 style deals."
+msgstr "ההטבה חלה על אותם מוצרים/קטגוריות שנבחרו ב\"מה הלקוח חייב לקנות\" למעלה — אידיאלי למבצעי 5+1."
+
+msgid "Discount applied to the cheapest items"
+msgstr "ההנחה חלה על הפריטים הזולים"
+
+msgid "Apply the discount to the cheapest items"
+msgstr "החל את ההנחה על המוצרים הזולים"
+
+msgid "By default the benefit is spread across price tiers as required by law (e.g. 4 items with 2 free → one dearer and one cheaper item are free, not both cheap ones). Turn this on to discount only the cheapest items instead."
+msgstr "כברירת מחדל ההטבה מתחלקת בין מדרגות המחיר כנדרש בחוק (לדוגמה: 4 פריטים עם 2 חינם ← פריט יקר אחד ופריט זול אחד חינם, ולא שני הזולים). הפעל כדי להחיל את ההנחה רק על המוצרים הזולים."
+
+msgid "All platforms"
+msgstr "כל הפלטפורמות"
+
+msgid "Platform"
+msgstr "פלטפורמה"
+
+msgid "Where does it run?"
+msgstr "היכן המבצע פעיל?"
+
+msgid "Choose where this promotion is active. App-only promotions apply only to shoppers browsing inside the app."
+msgstr "בחר היכן המבצע פעיל. מבצעים לאפליקציה בלבד חלים רק על לקוחות שגולשים בתוך האפליקציה."
+
+msgid "Show as a discount in the cart"
+msgstr "הצג כהנחה בסל"
+
+msgid "Instead of a before/after price and label on each product, the discount appears as a single line in the cart summary under the promotion name."
+msgstr "במקום מחיר לפני/אחרי ותווית על כל מוצר, ההנחה מופיעה כשורה אחת בסיכום הסל תחת שם המבצע."
+
+msgid "Available on web and app"
+msgstr "זמין באתר ובאפליקציה"
+
+msgid "Website only"
+msgstr "אתר בלבד"
+
+msgid "App only"
+msgstr "אפליקציה בלבד"

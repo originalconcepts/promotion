@@ -1,0 +1,690 @@
+<?php
+/**
+ * WooCommerce cart integration.
+ *
+ * Applies engine results to the cart and renders before/after pricing.
+ *
+ * @package PromoEngine
+ */
+
+namespace PromoEngine;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+class Cart {
+
+	/** @var Engine */
+	private $engine;
+
+	/** @var array|null Cached last evaluation for the current request. */
+	private $last_eval = null;
+
+	/** @var bool Encouragement messages already rendered this request? */
+	private $messages_rendered = false;
+
+	/** @var bool Savings line already rendered this request? */
+	private $savings_rendered = false;
+
+	/** @var bool Re-entrancy guard for auto-gift syncing. */
+	private $syncing_gifts = false;
+
+	public function __construct( Engine $engine ) {
+		$this->engine = $engine;
+
+		add_action( 'woocommerce_before_calculate_totals', array( $this, 'apply_line_discounts' ), 20, 1 );
+		add_action( 'woocommerce_cart_calculate_fees', array( $this, 'apply_cart_fees' ), 20, 1 );
+
+		// Before/after price display in the cart line + subtotal.
+		add_filter( 'woocommerce_cart_item_price', array( $this, 'cart_item_price_html' ), 20, 3 );
+		add_filter( 'woocommerce_cart_item_subtotal', array( $this, 'cart_item_subtotal_html' ), 20, 3 );
+
+		add_action( 'woocommerce_cart_totals_before_order_total', array( $this, 'render_cart_savings' ) );
+		// Box fallbacks for themes that don't fire the totals-table hook — wired
+		// to the very same points as the green message box (which renders fine on
+		// these themes), so "You saved" shows in the same spot and style.
+		add_action( 'woocommerce_before_cart', array( $this, 'render_cart_savings_box' ), 22 );
+		add_action( 'woocommerce_before_cart_table', array( $this, 'render_cart_savings_box' ), 22 );
+		add_action( 'woocommerce_before_cart_totals', array( $this, 'render_cart_savings_box' ), 6 );
+		add_action( 'woocommerce_proceed_to_checkout', array( $this, 'render_cart_savings_box' ), 5 );
+		add_action( 'woocommerce_after_cart_totals', array( $this, 'render_cart_savings_box' ), 20 );
+		// Mini-cart / side-drawer carts (used by many custom storefronts) fire
+		// their own hooks rather than the cart-page ones above.
+		add_action( 'woocommerce_widget_shopping_cart_before_buttons', array( $this, 'render_cart_savings_box' ), 5 );
+		add_action( 'woocommerce_widget_shopping_cart_total', array( $this, 'render_cart_savings_box' ), 5 );
+		add_action( 'woocommerce_after_mini_cart', array( $this, 'render_cart_savings_box' ), 5 );
+		add_shortcode( 'promeng_savings', array( $this, 'savings_shortcode' ) );
+
+		// Encouragement nudges. Several hook points for theme resilience; a
+		// guard makes sure they render only once per page.
+		add_action( 'woocommerce_before_cart', array( $this, 'render_cart_messages' ), 20 );
+		add_action( 'woocommerce_before_cart_table', array( $this, 'render_cart_messages' ), 20 );
+		add_action( 'woocommerce_before_cart_totals', array( $this, 'render_cart_messages' ), 5 );
+		// Reliable fallback: a row inside the cart-totals table (fires on nearly
+		// every classic theme, same place as the savings line).
+		add_action( 'woocommerce_cart_totals_before_order_total', array( $this, 'render_cart_messages_row' ), 5 );
+		// Universal manual placement for any theme/builder.
+		add_shortcode( 'promeng_cart_messages', array( $this, 'messages_shortcode' ) );
+
+		// Persist the discounted prices onto the actual order line items so the
+		// placed order reflects what the customer saw in the cart.
+		add_action( 'woocommerce_checkout_create_order_line_item', array( $this, 'set_order_line_item_discount' ), 20, 4 );
+		add_action( 'woocommerce_checkout_create_order', array( $this, 'store_applied_on_order' ), 20, 2 );
+
+		add_action( 'woocommerce_order_status_processing', array( Usage::class, 'record_for_order' ) );
+		add_action( 'woocommerce_order_status_completed', array( Usage::class, 'record_for_order' ) );
+
+		// Show the promotion savings in the customer's order (account + emails).
+		add_filter( 'woocommerce_get_order_item_totals', array( $this, 'order_savings_total_row' ), 10, 3 );
+		// Struck original + discounted price per line in the order (account + emails).
+		add_filter( 'woocommerce_order_formatted_line_subtotal', array( $this, 'order_line_subtotal_html' ), 10, 3 );
+		// For our "unlock token" coupons, show the real engine savings (not ₪0).
+		add_filter( 'woocommerce_cart_totals_coupon_html', array( $this, 'coupon_savings_html' ), 10, 3 );
+
+		// Auto-add free gifts: keep them in sync with cart lifecycle events.
+		add_action( 'woocommerce_cart_loaded_from_session', array( $this, 'sync_auto_gifts' ), 20 );
+		add_action( 'woocommerce_add_to_cart', array( $this, 'sync_auto_gifts' ), 20 );
+		add_action( 'woocommerce_cart_item_removed', array( $this, 'sync_auto_gifts' ), 20 );
+		add_action( 'woocommerce_cart_item_restored', array( $this, 'sync_auto_gifts' ), 20 );
+		add_action( 'woocommerce_after_cart_item_quantity_update', array( $this, 'sync_auto_gifts' ), 20 );
+		// Gift lines are managed by the plugin: lock qty, hide remove, badge it.
+		add_filter( 'woocommerce_cart_item_quantity', array( $this, 'gift_quantity_html' ), 10, 3 );
+		add_filter( 'woocommerce_cart_item_remove_link', array( $this, 'gift_remove_link' ), 10, 2 );
+		add_filter( 'woocommerce_cart_item_name', array( $this, 'gift_item_name' ), 10, 2 );
+	}
+
+	/**
+	 * Build a normalized snapshot of the WC cart for the engine.
+	 *
+	 * @return array [ array $lines, array $context ]
+	 */
+	private function snapshot( \WC_Cart $cart, $exclude_gifts = false ) {
+		$lines             = array();
+		$subtotal          = 0.0;
+		$display_subtotal  = 0.0;
+
+		foreach ( $cart->get_cart() as $key => $item ) {
+			if ( $exclude_gifts && ! empty( $item['promeng_gift'] ) ) {
+				continue; // don't let an auto-added gift count toward the buy condition.
+			}
+			$product = $item['data'];
+			if ( ! $product instanceof \WC_Product ) {
+				continue;
+			}
+			$unit_price = isset( $item['promeng_base_price'] ) ? (float) $item['promeng_base_price'] : (float) $product->get_price();
+			$qty        = (float) $item['quantity'];
+			$line_total = $unit_price * $qty;
+			$subtotal  += $line_total;
+
+			// Display total = what the customer sees (tax-inclusive if the store
+			// shows prices incl. tax). Used for purchase-threshold comparisons so
+			// "on orders over 300" matches the on-screen cart, not the ex-tax base.
+			$display_subtotal += (float) wc_get_price_to_display( $product, array( 'price' => $unit_price, 'qty' => $qty ) );
+
+			$lines[] = array(
+				'key'          => $key,
+				'product_id'   => $product->get_id(),
+				'parent_id'    => $product->get_parent_id(),
+				'category_ids' => $this->product_category_ids( $product ),
+				'price'        => $unit_price,
+				'qty'          => $qty,
+				'line_total'   => $line_total,
+				'is_gift'      => ! empty( $item['promeng_gift'] ),
+			);
+		}
+
+		$customer_email = WC()->customer ? WC()->customer->get_billing_email() : '';
+
+		$applied_coupons = array();
+		foreach ( (array) $cart->get_applied_coupons() as $code ) {
+			$applied_coupons[] = strtolower( (string) $code );
+		}
+
+		$context = array(
+			'subtotal'         => $subtotal,
+			'display_subtotal' => $display_subtotal,
+			'customer_id'      => get_current_user_id(),
+			'customer_email'   => $customer_email,
+			'applied_coupons'  => $applied_coupons,
+			'channel'          => App::current_channel(),
+		);
+
+		return array( $lines, $context );
+	}
+
+	/**
+	 * Category ids including ancestors.
+	 *
+	 * @return int[]
+	 */
+	private function product_category_ids( \WC_Product $product ) {
+		$id  = $product->get_parent_id() ? $product->get_parent_id() : $product->get_id();
+		$ids = wc_get_product_term_ids( $id, 'product_cat' );
+		$all = $ids;
+		foreach ( $ids as $cat_id ) {
+			$all = array_merge( $all, get_ancestors( $cat_id, 'product_cat' ) );
+		}
+		return array_values( array_unique( array_map( 'intval', $all ) ) );
+	}
+
+	/**
+	 * Apply per-line discounts by lowering each qualifying line's unit price.
+	 *
+	 * Idempotent: always computes from the stamped base price, so it is safe to
+	 * run on every recalculation (no compounding) — which is why we do NOT use a
+	 * did_action guard here.
+	 */
+	public function apply_line_discounts( $cart ) {
+		if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
+			return;
+		}
+		if ( ! $cart instanceof \WC_Cart || $cart->is_empty() ) {
+			return;
+		}
+
+		// Stamp original prices once, before any discount, so recompute is stable.
+		foreach ( $cart->get_cart() as $key => $item ) {
+			if ( ! isset( $cart->cart_contents[ $key ]['promeng_base_price'] ) ) {
+				$cart->cart_contents[ $key ]['promeng_base_price'] = (float) $item['data']->get_price();
+			}
+		}
+
+		list( $lines, $context ) = $this->snapshot( $cart );
+		$eval                    = $this->engine->evaluate( $lines, $context );
+		$this->last_eval         = $eval;
+
+		foreach ( $cart->get_cart() as $key => $item ) {
+			if ( isset( $eval['line_discounts'][ $key ] ) && $eval['line_discounts'][ $key ] > 0 ) {
+				$base = (float) $cart->cart_contents[ $key ]['promeng_base_price'];
+				$new  = max( 0, $base - (float) $eval['line_discounts'][ $key ] );
+				$item['data']->set_price( $new );
+			}
+		}
+	}
+
+	/**
+	 * Apply whole-cart discounts as negative fees.
+	 */
+	public function apply_cart_fees( $cart ) {
+		if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
+			return;
+		}
+		if ( ! $cart instanceof \WC_Cart || $cart->is_empty() ) {
+			return;
+		}
+
+		if ( null === $this->last_eval ) {
+			list( $lines, $context ) = $this->snapshot( $cart );
+			$this->last_eval         = $this->engine->evaluate( $lines, $context );
+		}
+
+		foreach ( $this->last_eval['cart_fees'] as $fee ) {
+			if ( $fee['amount'] > 0 ) {
+				$cart->add_fee( $fee['name'], - $fee['amount'], false );
+			}
+		}
+	}
+
+	/**
+	 * Cart line unit price: show original struck-through + discounted.
+	 */
+	public function cart_item_price_html( $price_html, $cart_item, $cart_item_key ) {
+		if ( ! isset( $cart_item['promeng_base_price'] ) || ! ( $cart_item['data'] instanceof \WC_Product ) ) {
+			return $price_html;
+		}
+		$base    = (float) $cart_item['promeng_base_price'];
+		$current = (float) $cart_item['data']->get_price();
+		if ( $current >= $base ) {
+			return $price_html;
+		}
+		return $this->before_after_html( $base, $current );
+	}
+
+	/**
+	 * Cart line subtotal: show original struck-through + discounted (x qty).
+	 */
+	public function cart_item_subtotal_html( $subtotal_html, $cart_item, $cart_item_key ) {
+		if ( ! isset( $cart_item['promeng_base_price'] ) || ! ( $cart_item['data'] instanceof \WC_Product ) ) {
+			return $subtotal_html;
+		}
+		$qty     = (float) $cart_item['quantity'];
+		$base    = (float) $cart_item['promeng_base_price'] * $qty;
+		$current = (float) $cart_item['data']->get_price() * $qty;
+		if ( $current >= $base ) {
+			return $subtotal_html;
+		}
+		return $this->before_after_html( $base, $current );
+	}
+
+	private function before_after_html( $base, $current ) {
+		return '<span class="promeng-was" style="text-decoration:line-through;color:#6b7280;opacity:1;margin-inline-end:6px;">' . wp_kses_post( wc_price( $base ) ) . '</span> '
+			. '<span class="promeng-now" style="color:#dc2626;font-weight:700;">' . wp_kses_post( wc_price( $current ) ) . '</span>';
+	}
+
+	/**
+	 * Show a total-savings line in the cart totals.
+	 */
+	/**
+	 * Encouragement nudges ("add X to unlock…") above the cart / checkout.
+	 */
+	/**
+	 * Build the encouragement-messages HTML, or '' when there's nothing to show.
+	 */
+	private function build_messages_html() {
+		if ( ! function_exists( 'WC' ) || ! WC()->cart || WC()->cart->is_empty() ) {
+			return '';
+		}
+		list( $lines, $context ) = $this->snapshot( WC()->cart );
+		$messages                = $this->engine->messages( $lines, $context );
+		if ( empty( $messages ) ) {
+			return '';
+		}
+		$messages = array_slice( $messages, 0, 4 ); // keep it from getting noisy.
+
+		$icon = '<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false">'
+			. '<path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" '
+			. 'd="M20 12v8H4v-8M2 7h20v5H2zM12 22V7M12 7H8.5a2.5 2.5 0 1 1 0-5C11 2 12 7 12 7zM12 7h3.5a2.5 2.5 0 1 0 0-5C13 2 12 7 12 7z"/></svg>';
+
+		$html = '<div class="promeng-cart-messages">';
+		foreach ( $messages as $m ) {
+			$html .= '<div class="promeng-cart-message"><span class="promeng-cart-message-icon">' . $icon . '</span>'
+				. '<span class="promeng-cart-message-text">' . esc_html( $m ) . '</span></div>';
+		}
+		$html .= '</div>';
+		return $html;
+	}
+
+	/**
+	 * Auto-injected nudges (div) for non-table hook points. Renders once.
+	 */
+	public function render_cart_messages() {
+		if ( $this->messages_rendered ) {
+			return;
+		}
+		$html = $this->build_messages_html();
+		if ( '' === $html ) {
+			return;
+		}
+		$this->messages_rendered = true;
+		echo $html; // phpcs:ignore WordPress.Security.EscapeOutput
+	}
+
+	/**
+	 * Fallback nudges as a full-width row inside the cart-totals table — the
+	 * one place that renders on virtually every classic theme. Renders once.
+	 */
+	public function render_cart_messages_row() {
+		if ( $this->messages_rendered ) {
+			return;
+		}
+		$html = $this->build_messages_html();
+		if ( '' === $html ) {
+			return;
+		}
+		$this->messages_rendered = true;
+		echo '<tr class="promeng-cart-messages-row"><td colspan="2">' . $html . '</td></tr>'; // phpcs:ignore WordPress.Security.EscapeOutput
+	}
+
+	/**
+	 * Universal manual placement: [promeng_cart_messages]. Works on any theme or
+	 * builder (drop it on the cart/checkout page). Always renders if there are
+	 * messages; suppresses the auto-injected copy to avoid duplicates.
+	 */
+	public function messages_shortcode() {
+		$html = $this->build_messages_html();
+		if ( '' === $html ) {
+			return '';
+		}
+		$this->messages_rendered = true;
+		return $html;
+	}
+
+	/**
+	 * Total saved + the per-promotion breakdown rows, or null if nothing saved.
+	 */
+	private function savings_data() {
+		if ( null === $this->last_eval ) {
+			if ( ! function_exists( 'WC' ) || ! WC()->cart || WC()->cart->is_empty() ) {
+				return null;
+			}
+			list( $lines, $context ) = $this->snapshot( WC()->cart );
+			$this->last_eval         = $this->engine->evaluate( $lines, $context );
+		}
+		if ( empty( $this->last_eval['applied'] ) ) {
+			return null;
+		}
+		$total = 0.0;
+		$rows  = '';
+		foreach ( $this->last_eval['applied'] as $info ) {
+			if ( (float) $info['saved'] <= 0 ) {
+				continue;
+			}
+			$total += (float) $info['saved'];
+			$name   = $info['promotion']->name ? $info['promotion']->name : $info['label'];
+			$rows  .= '<li><span class="promeng-pop-name">' . esc_html( $name ) . '</span>'
+				. '<span class="promeng-pop-amt">-' . wp_kses_post( wc_price( $info['saved'] ) ) . '</span></li>';
+		}
+		if ( $total <= 0 ) {
+			return null;
+		}
+		return array( 'total' => $total, 'rows' => $rows );
+	}
+
+	private function savings_info_svg() {
+		return '<svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true" focusable="false">'
+			. '<circle cx="10" cy="10" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/>'
+			. '<circle cx="10" cy="6" r="1.1" fill="currentColor"/>'
+			. '<rect x="9.1" y="8.6" width="1.8" height="6" rx="0.9" fill="currentColor"/></svg>';
+	}
+
+	/**
+	 * Savings line as a totals-table row (classic cart/checkout totals).
+	 */
+	public function render_cart_savings() {
+		if ( $this->savings_rendered ) {
+			return;
+		}
+		$data = $this->savings_data();
+		if ( ! $data ) {
+			return;
+		}
+		$this->savings_rendered = true;
+
+		echo '<tr class="promeng-savings"><th>'
+			. esc_html__( 'You saved on this purchase', 'promotion-engine' )
+			. ' <button type="button" class="promeng-info" aria-label="' . esc_attr__( 'Applied promotions', 'promotion-engine' ) . '">' . $this->savings_info_svg() . '</button>' // phpcs:ignore WordPress.Security.EscapeOutput
+			. '</th><td data-title="' . esc_attr__( 'You saved on this purchase', 'promotion-engine' ) . '">'
+			. wp_kses_post( wc_price( $data['total'] ) )
+			. '<div class="promeng-popup" role="dialog">'
+			. '<div class="promeng-popup-title">' . esc_html__( 'Applied promotions', 'promotion-engine' ) . '</div>'
+			. '<ul>' . $data['rows'] . '</ul></div>' // phpcs:ignore WordPress.Security.EscapeOutput
+			. '</td></tr>';
+	}
+
+	/**
+	 * Savings line as a standalone box, for hook points outside the totals
+	 * table (and the same markup the shortcode uses). Renders once.
+	 */
+	public function render_cart_savings_box() {
+		if ( $this->savings_rendered ) {
+			return;
+		}
+		$html = $this->savings_shortcode(); // sets the guard + returns markup.
+		if ( '' === $html ) {
+			return;
+		}
+		echo $html; // phpcs:ignore WordPress.Security.EscapeOutput
+	}
+
+	/**
+	 * Universal manual placement of the savings line: [promeng_savings].
+	 */
+	public function savings_shortcode() {
+		$data = $this->savings_data();
+		if ( ! $data ) {
+			return '';
+		}
+		$this->savings_rendered = true;
+
+		return '<div class="promeng-savings-box">'
+			. '<div class="promeng-savings-box-head"><span>' . esc_html__( 'You saved on this purchase', 'promotion-engine' ) . '</span>'
+			. '<span class="promeng-savings-box-total">' . wp_kses_post( wc_price( $data['total'] ) ) . '</span></div>'
+			. '<ul class="promeng-savings-box-list">' . $data['rows'] . '</ul>'
+			. '</div>';
+	}
+
+	/**
+	 * Write the discounted price onto the actual order line item.
+	 *
+	 * The cart shows discounted prices via a runtime set_price(); this makes the
+	 * placed order match by setting the line subtotal (original) and total
+	 * (discounted) so the order — and everything downstream — reflects the deal.
+	 *
+	 * @param \WC_Order_Item_Product $item
+	 * @param string                 $cart_item_key
+	 * @param array                  $values
+	 * @param \WC_Order              $order
+	 */
+	public function set_order_line_item_discount( $item, $cart_item_key, $values, $order ) {
+		if ( empty( $values['data'] ) || ! $values['data'] instanceof \WC_Product ) {
+			return;
+		}
+		if ( ! isset( $values['promeng_base_price'] ) ) {
+			return; // line we never touched.
+		}
+		$base    = (float) $values['promeng_base_price'];
+		$current = (float) $values['data']->get_price();
+		if ( $current >= $base ) {
+			return; // no active discount on this line.
+		}
+		$qty = (float) $values['quantity'];
+
+		// Subtotal = original (so the markdown is visible on the order),
+		// total = discounted (what the customer actually pays).
+		$item->set_subtotal( $base * $qty );
+		$item->set_total( $current * $qty );
+	}
+
+	/**
+	 * Keep auto-add free gifts in sync with what the cart currently earns.
+	 * Runs outside totals calculation (cart lifecycle events) so adding/removing
+	 * items is safe; a guard prevents re-entrancy.
+	 */
+	public function sync_auto_gifts() {
+		if ( $this->syncing_gifts ) {
+			return;
+		}
+		if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
+			return;
+		}
+		if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
+			return;
+		}
+		$cart = WC()->cart;
+		if ( ! $cart instanceof \WC_Cart ) {
+			return;
+		}
+		$this->syncing_gifts = true;
+
+		// Evaluate the buy condition against non-gift lines only.
+		list( $lines, $context ) = $this->snapshot( $cart, true );
+		$desired                 = $this->engine->auto_gifts( $lines, $context );
+
+		// What auto-gifts are already in the cart: promo_id => cart_item_key.
+		$existing = array();
+		foreach ( $cart->get_cart() as $key => $item ) {
+			if ( ! empty( $item['promeng_gift'] ) ) {
+				$existing[ (int) $item['promeng_gift'] ] = $key;
+			}
+		}
+
+		// Remove gifts that are no longer earned.
+		foreach ( $existing as $promo_id => $key ) {
+			if ( empty( $desired[ $promo_id ] ) ) {
+				$cart->remove_cart_item( $key );
+			}
+		}
+
+		// Add or right-size the earned gifts.
+		foreach ( $desired as $promo_id => $gift ) {
+			$pid = (int) $gift['product_id'];
+			$qty = (int) $gift['qty'];
+			if ( $pid <= 0 || $qty <= 0 ) {
+				continue;
+			}
+			$product = wc_get_product( $pid );
+			if ( ! $product || ! $product->is_purchasable() || ! $product->is_in_stock() ) {
+				continue;
+			}
+			if ( isset( $existing[ $promo_id ] ) ) {
+				$key   = $existing[ $promo_id ];
+				$items = $cart->get_cart();
+				if ( isset( $items[ $key ] ) && (float) $items[ $key ]['quantity'] !== (float) $qty ) {
+					$cart->set_quantity( $key, $qty, false );
+				}
+			} else {
+				$cart->add_to_cart( $pid, $qty, 0, array(), array( 'promeng_gift' => $promo_id ) );
+			}
+		}
+
+		$this->syncing_gifts = false;
+	}
+
+	/**
+	 * Lock the quantity field for gift lines (shown as plain text, not editable).
+	 */
+	public function gift_quantity_html( $html, $cart_item_key, $cart_item ) {
+		if ( ! empty( $cart_item['promeng_gift'] ) ) {
+			return esc_html( $cart_item['quantity'] );
+		}
+		return $html;
+	}
+
+	/**
+	 * Hide the remove link for gift lines (they manage themselves).
+	 */
+	public function gift_remove_link( $link, $cart_item_key ) {
+		$cart = WC()->cart ? WC()->cart->get_cart() : array();
+		if ( isset( $cart[ $cart_item_key ] ) && ! empty( $cart[ $cart_item_key ]['promeng_gift'] ) ) {
+			return '';
+		}
+		return $link;
+	}
+
+	/**
+	 * Tag the gift line name with a small "Free gift" badge.
+	 */
+	public function gift_item_name( $name, $cart_item ) {
+		if ( ! empty( $cart_item['promeng_gift'] ) ) {
+			$name .= ' <span class="promeng-gift-badge">' . esc_html__( 'Free gift', 'promotion-engine' ) . '</span>';
+		}
+		return $name;
+	}
+
+	/**
+	 * Replace the "-₪0.00" shown for our unlock-token coupons with the real,
+	 * engine-computed savings for the matching promotion.
+	 */
+	public function coupon_savings_html( $html, $coupon, $discount_html = '' ) {
+		if ( ! $coupon instanceof \WC_Coupon || null === $this->last_eval || empty( $this->last_eval['applied'] ) ) {
+			return $html;
+		}
+		$code = strtolower( (string) $coupon->get_code() );
+		foreach ( $this->last_eval['applied'] as $info ) {
+			$promo = isset( $info['promotion'] ) ? $info['promotion'] : null;
+			if ( ! $promo || ! $promo->requires_coupon || 'discount' === $promo->type ) {
+				continue;
+			}
+			if ( strtolower( (string) $promo->coupon_code ) !== $code ) {
+				continue;
+			}
+			$saved = (float) $info['saved'];
+			if ( $saved <= 0 ) {
+				return $html;
+			}
+			$new_amount = '-' . wp_kses_post( wc_price( $saved ) );
+			if ( '' !== $discount_html && false !== strpos( $html, $discount_html ) ) {
+				return str_replace( $discount_html, $new_amount, $html );
+			}
+			return $new_amount;
+		}
+		return $html;
+	}
+
+	/**
+	 * Show the original (struck) and discounted line price in the order, both in
+	 * the customer's account and in order emails.
+	 */
+	public function order_line_subtotal_html( $subtotal_html, $item, $order ) {
+		if ( ! $item instanceof \WC_Order_Item_Product || ! $order instanceof \WC_Order ) {
+			return $subtotal_html;
+		}
+		$inc = ( 'incl' === get_option( 'woocommerce_tax_display_cart' ) );
+		$sub = (float) $order->get_line_subtotal( $item, $inc );
+		$tot = (float) $order->get_line_total( $item, $inc );
+		if ( $sub <= 0 || $tot >= $sub ) {
+			return $subtotal_html; // no discount on this line.
+		}
+		$args = array( 'currency' => $order->get_currency() );
+		return '<span style="text-decoration:line-through;color:#6b7280;margin-inline-end:6px;">' . wp_kses_post( wc_price( $sub, $args ) ) . '</span> '
+			. '<span style="color:#16a34a;font-weight:700;">' . wp_kses_post( wc_price( $tot, $args ) ) . '</span>';
+	}
+
+	/**
+	 * Inject a "You saved" row into the order totals shown in the customer's
+	 * account and order emails. Skipped if WooCommerce already itemises a
+	 * discount (e.g. a coupon), to avoid double-counting.
+	 */
+	public function order_savings_total_row( $total_rows, $order, $tax_display = '' ) {
+		if ( ! $order instanceof \WC_Order ) {
+			return $total_rows;
+		}
+		if ( (float) $order->get_total_discount() > 0 ) {
+			return $total_rows; // already itemised as a discount.
+		}
+		$applied = $order->get_meta( '_promeng_applied' );
+		if ( empty( $applied ) || ! is_array( $applied ) ) {
+			return $total_rows;
+		}
+		$saved = 0.0;
+		foreach ( $applied as $info ) {
+			$saved += isset( $info['saved'] ) ? (float) $info['saved'] : 0.0;
+		}
+		if ( $saved <= 0 ) {
+			return $total_rows;
+		}
+
+		$row = array(
+			'label' => __( 'You saved on this purchase', 'promotion-engine' ),
+			'value' => '-' . wp_strip_all_tags( wc_price( $saved, array( 'currency' => $order->get_currency() ) ) ),
+		);
+
+		$out      = array();
+		$inserted = false;
+		foreach ( $total_rows as $key => $value ) {
+			$out[ $key ] = $value;
+			if ( 'cart_subtotal' === $key ) {
+				$out['promeng_savings'] = $row;
+				$inserted               = true;
+			}
+		}
+		if ( ! $inserted ) {
+			$out = array();
+			foreach ( $total_rows as $key => $value ) {
+				if ( 'order_total' === $key && ! isset( $out['promeng_savings'] ) ) {
+					$out['promeng_savings'] = $row;
+				}
+				$out[ $key ] = $value;
+			}
+		}
+		return $out;
+	}
+
+
+	public function store_applied_on_order( $order, $data ) {
+		$cart = WC()->cart;
+		if ( ! $cart ) {
+			return;
+		}
+		list( $lines, $context ) = $this->snapshot( $cart );
+		$eval                    = $this->engine->evaluate( $lines, $context );
+
+		$applied = array();
+		foreach ( $eval['applied'] as $promotion_id => $info ) {
+			$promotion = $info['promotion'];
+			$applied[ $promotion_id ] = array(
+				'name'        => $promotion->name,
+				// external_id + type let Giorgio link this redemption back to its own promotion (george-{id})
+				// and represent it correctly; null external_id = a promotion authored locally in WooCommerce.
+				'type'        => $promotion->type,
+				'external_id' => $promotion->external_id,
+				'coupon_code' => $promotion->coupon_code,
+				'saved'       => (float) $info['saved'],
+			);
+		}
+		if ( $applied ) {
+			$order->update_meta_data( '_promeng_applied', $applied );
+		}
+	}
+}
