@@ -44,7 +44,7 @@ class Coupon {
 			if ( ! $p->requires_coupon || ! $p->coupon_code ) {
 				continue;
 			}
-			if ( strtolower( $p->coupon_code ) === $code && $p->is_live() && App::promotion_runs_here( $p ) ) {
+			if ( strtolower( $p->coupon_code ) === $code && $p->is_live() && App::promotion_runs_here( $p ) && $p->customer_type_allowed( is_user_logged_in() ) ) {
 				return $p;
 			}
 		}

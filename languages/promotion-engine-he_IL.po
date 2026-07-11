@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Promotion Engine 0.4.2\n"
+"Project-Id-Version: Promotion Engine 0.9.6\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -774,3 +774,33 @@ msgstr "אתר בלבד"
 
 msgid "App only"
 msgstr "אפליקציה בלבד"
+
+msgid "Who is it for?"
+msgstr "למי זה מיועד?"
+
+msgid "Limit the promotion by customer type. It always applies within the selected audience."
+msgstr "הגבלת המבצע לפי סוג לקוח. המבצע חל תמיד בתוך קהל היעד שנבחר."
+
+msgid "Everyone"
+msgstr "כולם"
+
+msgid "all shoppers (registered and guests)"
+msgstr "כל הקונים (רשומים ואורחים)"
+
+msgid "Registered customers"
+msgstr "לקוחות רשומים"
+
+msgid "only shoppers who are logged in"
+msgstr "רק קונים מחוברים"
+
+msgid "Guests"
+msgstr "אורחים"
+
+msgid "only shoppers who are not logged in"
+msgstr "רק קונים שאינם מחוברים"
+
+msgid "Registered customers only"
+msgstr "ללקוחות רשומים בלבד"
+
+msgid "Guests only (not logged in)"
+msgstr "לאורחים בלבד (לא מחוברים)"

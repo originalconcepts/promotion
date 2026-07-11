@@ -84,6 +84,9 @@ class Engine {
 			if ( ! App::promotion_runs_here( $promotion, isset( $context['channel'] ) ? $context['channel'] : null ) ) {
 				continue; // promotion isn't enabled on this platform (web/app).
 			}
+			if ( ! $promotion->customer_type_allowed( ! empty( $context['is_logged_in'] ) ) ) {
+				continue; // promotion isn't for this shopper (registered / guest).
+			}
 			if ( ! $promotion->is_automatic() ) {
 				// Coupon-required. Discount-type coupons are applied natively by
 				// WooCommerce (see Coupon), so the engine leaves those alone.
@@ -161,6 +164,9 @@ class Engine {
 			if ( ! App::promotion_runs_here( $promotion, isset( $context['channel'] ) ? $context['channel'] : null ) ) {
 				continue;
 			}
+			if ( ! $promotion->customer_type_allowed( ! empty( $context['is_logged_in'] ) ) ) {
+				continue;
+			}
 			if ( $promotion->limit_per_customer && Usage::customer_reached_limit( $promotion, $context['customer_id'], $context['customer_email'] ) ) {
 				continue;
 			}
@@ -198,6 +204,9 @@ class Engine {
 				continue;
 			}
 			if ( ! App::promotion_runs_here( $promotion, isset( $context['channel'] ) ? $context['channel'] : null ) ) {
+				continue;
+			}
+			if ( ! $promotion->customer_type_allowed( ! empty( $context['is_logged_in'] ) ) ) {
 				continue;
 			}
 			if ( $promotion->limit_per_customer && Usage::customer_reached_limit( $promotion, isset( $context['customer_id'] ) ? $context['customer_id'] : 0, isset( $context['customer_email'] ) ? $context['customer_email'] : '' ) ) {

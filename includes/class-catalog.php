@@ -61,8 +61,9 @@ class Catalog {
 			return $this->promos;
 		}
 		$this->promos = array();
+		$logged_in    = is_user_logged_in();
 		foreach ( Repository::active() as $p ) {
-			if ( $p->is_live() && App::promotion_runs_here( $p ) ) {
+			if ( $p->is_live() && App::promotion_runs_here( $p ) && $p->customer_type_allowed( $logged_in ) ) {
 				$this->promos[] = $p;
 			}
 		}

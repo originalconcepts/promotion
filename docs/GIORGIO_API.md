@@ -52,6 +52,7 @@ Body — a single object, a bare array, or `{ "promotions": [ ... ] }`:
       "name": "10% off poultry",
       "type": "discount",
       "active": true,
+      "customer_type": "all",
       "show_label": true,
       "requires_coupon": false,
       "coupon_code": null,
@@ -76,6 +77,7 @@ Body — a single object, a bare array, or `{ "promotions": [ ... ] }`:
 | `name` | string | Display name (shown on labels/cart). |
 | `type` | string | One of `discount`, `buy_x_pay_y`, `buy_x_get_y`. |
 | `active` | bool | Whether the promotion runs. |
+| `customer_type` | string | Audience by account status: `all` (default), `registered` (logged-in customers only), or `guest` (not-logged-in shoppers only). |
 | `show_label` | bool | Show the catalog/cart label. Default `true`. |
 | `requires_coupon` | bool | If `true`, applies only when the coupon code is entered at the cart/checkout. |
 | `coupon_code` | string\|null | Coupon code that unlocks the promotion. Works for **all** types: `discount` maps to a native WooCommerce coupon; `buy_x_pay_y` / `buy_x_get_y` use a zero-amount "unlock token" coupon and the engine applies the real, cart-aware discount once the code is present. |

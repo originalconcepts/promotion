@@ -13,9 +13,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$is_new   = ! $promotion->id;
-$cfg      = $promotion->config;
-$channels = $promotion->channels ? $promotion->channels : array( 'web' );
+$is_new        = ! $promotion->id;
+$cfg           = $promotion->config;
+$channels      = $promotion->channels ? $promotion->channels : array( 'web' );
+$customer_type = in_array( $promotion->customer_type, array( 'all', 'registered', 'guest' ), true ) ? $promotion->customer_type : 'all';
 
 $applies_to = isset( $cfg['applies_to'] ) ? $cfg['applies_to'] : 'all';
 $disabled   = $readonly ? 'disabled' : '';
@@ -98,6 +99,25 @@ $product_options = function ( $ids ) {
 					<span class="promeng-slider"></span>
 				</span>
 				<span><?php esc_html_e( 'Show promotion label on the product in the catalog', 'promotion-engine' ); ?></span>
+			</label>
+		</div>
+
+
+		<!-- קהל יעד (סוג לקוח) -->
+		<div class="promeng-card">
+			<h2><?php esc_html_e( 'Who is it for?', 'promotion-engine' ); ?></h2>
+			<p class="description"><?php esc_html_e( 'Limit the promotion by customer type. It always applies within the selected audience.', 'promotion-engine' ); ?></p>
+			<label class="promeng-row promeng-radio-row">
+				<input type="radio" name="customer_type" value="all" <?php checked( $customer_type, 'all' ); ?> <?php echo esc_attr( $disabled ); ?>>
+				<span><strong><?php esc_html_e( 'Everyone', 'promotion-engine' ); ?></strong> — <?php esc_html_e( 'all shoppers (registered and guests)', 'promotion-engine' ); ?></span>
+			</label>
+			<label class="promeng-row promeng-radio-row">
+				<input type="radio" name="customer_type" value="registered" <?php checked( $customer_type, 'registered' ); ?> <?php echo esc_attr( $disabled ); ?>>
+				<span><strong><?php esc_html_e( 'Registered customers', 'promotion-engine' ); ?></strong> — <?php esc_html_e( 'only shoppers who are logged in', 'promotion-engine' ); ?></span>
+			</label>
+			<label class="promeng-row promeng-radio-row">
+				<input type="radio" name="customer_type" value="guest" <?php checked( $customer_type, 'guest' ); ?> <?php echo esc_attr( $disabled ); ?>>
+				<span><strong><?php esc_html_e( 'Guests', 'promotion-engine' ); ?></strong> — <?php esc_html_e( 'only shoppers who are not logged in', 'promotion-engine' ); ?></span>
 			</label>
 		</div>
 

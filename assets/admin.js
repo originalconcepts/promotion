@@ -309,6 +309,14 @@
 			if (lpc === 1) { lines.push({ ic: 'dashicons-admin-users', t: S.limit_one }); }
 			else if (lpc > 1) { lines.push({ ic: 'dashicons-admin-users', t: spf(S.limit_n, lpc) }); }
 
+			// Audience (customer type). Shown only when narrowed to registered/guest.
+			var ctype = $('.promeng-form input[name="customer_type"]:checked').val() || 'all';
+			if ('registered' === ctype && S.audience_registered) {
+				lines.push({ ic: 'dashicons-admin-users', t: S.audience_registered });
+			} else if ('guest' === ctype && S.audience_guest) {
+				lines.push({ ic: 'dashicons-admin-users', t: S.audience_guest });
+			}
+
 			// Platform (only when the app integration is active, i.e. there are
 			// real channel checkboxes). Reflects the actual web/app selection.
 			var chanInputs = $('.promeng-form input[name="channels[]"]');

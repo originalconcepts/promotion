@@ -146,6 +146,7 @@ class Cart {
 			'display_subtotal' => $display_subtotal,
 			'customer_id'      => get_current_user_id(),
 			'customer_email'   => $customer_email,
+			'is_logged_in'     => is_user_logged_in(),
 			'applied_coupons'  => $applied_coupons,
 			'channel'          => App::current_channel(),
 		);

@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Installer {
 
 	const DB_VERSION_OPTION = 'promeng_db_version';
-	const DB_VERSION        = '1.0.0';
+	const DB_VERSION        = '1.1.0';
 
 	/**
 	 * Promotions table name (with prefix).
@@ -69,6 +69,7 @@ class Installer {
 			type VARCHAR(40) NOT NULL DEFAULT 'discount',
 			active TINYINT(1) NOT NULL DEFAULT 1,
 			channels VARCHAR(120) NOT NULL DEFAULT 'web',
+			customer_type VARCHAR(20) NOT NULL DEFAULT 'all',
 			coupon_code VARCHAR(120) DEFAULT NULL,
 			requires_coupon TINYINT(1) NOT NULL DEFAULT 0,
 			show_label TINYINT(1) NOT NULL DEFAULT 0,

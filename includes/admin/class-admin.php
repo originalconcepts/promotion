@@ -89,6 +89,8 @@ class Admin {
 				'channel_both'    => __( 'Available on web and app', 'promotion-engine' ),
 				'channel_web'     => __( 'Website only', 'promotion-engine' ),
 				'channel_app'     => __( 'App only', 'promotion-engine' ),
+				'audience_registered' => __( 'Registered customers only', 'promotion-engine' ),
+				'audience_guest'      => __( 'Guests only (not logged in)', 'promotion-engine' ),
 				'days'            => array(
 					__( 'Sun', 'promotion-engine' ),
 					__( 'Mon', 'promotion-engine' ),
@@ -386,6 +388,7 @@ class Admin {
 			'type'               => $type,
 			'active'             => ! empty( $post['active'] ),
 			'channels'           => isset( $post['channels'] ) ? array_map( 'sanitize_key', (array) $post['channels'] ) : array( 'web' ),
+			'customer_type'      => isset( $post['customer_type'] ) && in_array( $post['customer_type'], array( 'all', 'registered', 'guest' ), true ) ? $post['customer_type'] : 'all',
 			'coupon_code'        => isset( $post['coupon_code'] ) ? sanitize_text_field( wp_unslash( $post['coupon_code'] ) ) : '',
 			'requires_coupon'    => ! empty( $post['requires_coupon'] ),
 			'show_label'         => ! empty( $post['show_label'] ),

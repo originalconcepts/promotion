@@ -183,6 +183,7 @@ class Rest {
 			'type'               => $type,
 			'active'             => ! empty( $raw['active'] ),
 			'channels'           => isset( $raw['channels'] ) ? array_map( 'sanitize_key', (array) $raw['channels'] ) : array( 'web' ),
+			'customer_type'      => isset( $raw['customer_type'] ) && in_array( $raw['customer_type'], array( 'all', 'registered', 'guest' ), true ) ? $raw['customer_type'] : 'all',
 			'coupon_code'        => ! empty( $raw['coupon_code'] ) ? sanitize_text_field( $raw['coupon_code'] ) : null,
 			'requires_coupon'    => ! empty( $raw['requires_coupon'] ),
 			'show_label'         => isset( $raw['show_label'] ) ? ! empty( $raw['show_label'] ) : true,

@@ -23,6 +23,8 @@ class Promotion {
 	public $active = true;
 	/** @var string[] */
 	public $channels = array( 'web' );
+	/** @var string all | registered | guest — who the promotion is for. */
+	public $customer_type = 'all';
 	/** @var string|null */
 	public $coupon_code = null;
 	/** @var bool */
@@ -62,6 +64,7 @@ class Promotion {
 		$p->type              = (string) $row['type'];
 		$p->active            = (bool) $row['active'];
 		$p->channels          = array_filter( explode( ',', (string) $row['channels'] ) );
+		$p->customer_type     = ! empty( $row['customer_type'] ) ? (string) $row['customer_type'] : 'all';
 		$p->coupon_code       = $row['coupon_code'] !== null ? (string) $row['coupon_code'] : null;
 		$p->requires_coupon   = (bool) $row['requires_coupon'];
 		$p->show_label        = (bool) $row['show_label'];
@@ -120,5 +123,26 @@ class Promotion {
 	 */
 	public function is_automatic() {
 		return ! $this->requires_coupon;
+	}
+
+	/**
+	 * Does the promotion apply to the current shopper's account status?
+	 *   all        — everyone
+	 *   registered — logged-in customers only
+	 *   guest      — guests (not logged in) only
+	 * An empty/unknown value is treated as "all" (back-compat).
+	 *
+	 * @param bool $is_logged_in Whether the current shopper is logged in.
+	 * @return bool
+	 */
+	public function customer_type_allowed( $is_logged_in ) {
+		switch ( $this->customer_type ) {
+			case 'registered':
+				return (bool) $is_logged_in;
+			case 'guest':
+				return ! $is_logged_in;
+			default:
+				return true;
+		}
 	}
 }

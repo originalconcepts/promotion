@@ -68,6 +68,7 @@ class Repository {
 			'type'               => isset( $data['type'] ) ? (string) $data['type'] : 'discount',
 			'active'             => ! empty( $data['active'] ) ? 1 : 0,
 			'channels'           => isset( $data['channels'] ) ? implode( ',', (array) $data['channels'] ) : 'web',
+			'customer_type'      => in_array( isset( $data['customer_type'] ) ? $data['customer_type'] : 'all', array( 'all', 'registered', 'guest' ), true ) ? $data['customer_type'] : 'all',
 			'coupon_code'        => ! empty( $data['coupon_code'] ) ? (string) $data['coupon_code'] : null,
 			'requires_coupon'    => ! empty( $data['requires_coupon'] ) ? 1 : 0,
 			'show_label'         => ! empty( $data['show_label'] ) ? 1 : 0,
@@ -173,6 +174,7 @@ class Repository {
 			'type'               => $p->type,
 			'active'             => 0,
 			'channels'           => $p->channels,
+			'customer_type'      => $p->customer_type,
 			'coupon_code'        => null, // avoid duplicate coupon codes.
 			'requires_coupon'    => $p->requires_coupon,
 			'show_label'         => $p->show_label,
