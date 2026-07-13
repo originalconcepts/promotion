@@ -83,6 +83,16 @@ class App {
 	 * @return bool
 	 */
 	public static function promotion_runs_here( Promotion $promotion, $channel = null ) {
+		// Interim measure: Giorgio does not yet send a per-promotion platform, so
+		// every Giorgio-authored promotion is stored as web-only and would be
+		// skipped inside the app. Until Giorgio can target platforms, run its
+		// promotions on all channels (web + app). Flip the filter to false — or
+		// remove this block — once Giorgio sends the channel per promotion.
+		if ( 'giorgio' === $promotion->source
+			&& apply_filters( 'promeng_giorgio_all_channels', true, $promotion ) ) {
+			return true;
+		}
+
 		$channels = array_filter( (array) $promotion->channels );
 		if ( empty( $channels ) ) {
 			$channels = array( 'web' );
