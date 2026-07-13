@@ -143,6 +143,7 @@ class Settings {
 		?>
 		<div class="wrap promeng-wrap">
 			<h1><?php echo esc_html( PROMENG_DISPLAY_NAME . ' — ' . __( 'Settings', 'promotion-engine' ) ); ?></h1>
+			<hr class="wp-header-end"><?php // keep other plugins' admin notices below the title. ?>
 
 			<?php if ( ! empty( $_GET['updated'] ) ) : // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
 				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Settings saved.', 'promotion-engine' ); ?></p></div>

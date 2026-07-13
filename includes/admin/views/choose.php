@@ -39,6 +39,7 @@ $types = array(
 ?>
 <div class="wrap promeng-wrap promeng-choose">
 	<h1><?php esc_html_e( 'Choose promotion type', 'promotion-engine' ); ?></h1>
+	<hr class="wp-header-end"><?php // keep other plugins' admin notices below the title. ?>
 	<div class="promeng-choose-list">
 		<?php foreach ( $types as $key => $t ) : ?>
 			<a class="promeng-choose-item" href="<?php echo esc_url( add_query_arg( 'type', $key, $base ) ); ?>">

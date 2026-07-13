@@ -100,6 +100,7 @@ class Settings {
 		?>
 		<div class="wrap promeng-giorgio">
 			<h1><?php esc_html_e( 'Giorgio Sync', 'promotion-engine' ); ?></h1>
+			<hr class="wp-header-end"><?php // keep other plugins' admin notices below the title. ?>
 
 			<?php if ( ! empty( $_GET['updated'] ) ) : ?>
 				<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Settings saved.', 'promotion-engine' ); ?></p></div>

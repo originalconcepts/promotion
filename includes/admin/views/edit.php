@@ -41,6 +41,7 @@ $product_options = function ( $ids ) {
 ?>
 <div class="wrap promeng-wrap promeng-edit">
 	<h1><?php echo $is_new ? esc_html( isset( $promeng_titles[ $type ] ) ? $promeng_titles[ $type ] : $promeng_titles['discount'] ) : esc_html__( 'Edit Promotion', 'promotion-engine' ); ?></h1>
+	<hr class="wp-header-end"><?php // keep other plugins' admin notices below the title. ?>
 
 	<?php if ( $readonly ) : ?>
 		<div class="notice notice-info"><p><?php esc_html_e( 'This promotion is managed in Giorgio and is read-only here. To edit it, update it in Giorgio.', 'promotion-engine' ); ?></p></div>

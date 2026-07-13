@@ -127,6 +127,9 @@ $ranges = array(
 		<a href="<?php echo esc_url( $new_url ); ?>" class="button button-primary promeng-new-btn">+&nbsp;<?php esc_html_e( 'Create promotion', 'promotion-engine' ); ?></a>
 		<h1><?php esc_html_e( 'Promotions', 'promotion-engine' ); ?></h1>
 	</div>
+	<?php // WordPress relocates other plugins' admin notices to just after this
+	// marker; without it they land inside .promeng-dash-head and break the header. ?>
+	<hr class="wp-header-end">
 
 	<?php if ( isset( $_GET['saved'] ) ) : // phpcs:ignore WordPress.Security.NonceVerification ?>
 		<div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Promotion saved.', 'promotion-engine' ); ?></p></div>
