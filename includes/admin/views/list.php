@@ -124,8 +124,10 @@ $ranges = array(
 <div class="wrap promeng-wrap promeng-dashboard">
 
 	<div class="promeng-dash-head">
-		<a href="<?php echo esc_url( $new_url ); ?>" class="button button-primary promeng-new-btn">+&nbsp;<?php esc_html_e( 'Create promotion', 'promotion-engine' ); ?></a>
+		<?php // Title first, button second: flexbox places the title at the inline
+		// start (right in RTL admin, left in LTR) and the button at the end. ?>
 		<h1><?php esc_html_e( 'Promotions', 'promotion-engine' ); ?></h1>
+		<a href="<?php echo esc_url( $new_url ); ?>" class="button button-primary promeng-new-btn">+&nbsp;<?php esc_html_e( 'Create promotion', 'promotion-engine' ); ?></a>
 	</div>
 	<?php // WordPress relocates other plugins' admin notices to just after this
 	// marker; without it they land inside .promeng-dash-head and break the header. ?>
