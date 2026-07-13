@@ -13,6 +13,23 @@
 	white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 
+/* Catalog label position (store-wide setting: bottom | top | top-right | top-left).
+   The base rule above is the "bottom" default; these override for the rest. */
+.promeng-thumb.promeng-pos-top .promeng-banner{
+	top:0;bottom:auto;left:0;right:0;
+	border-radius:0 0 14px 14px;
+	box-shadow:0 2px 6px rgba(0,0,0,.12);
+}
+.promeng-thumb.promeng-pos-top-right .promeng-banner,
+.promeng-thumb.promeng-pos-top-left .promeng-banner{
+	bottom:auto;left:auto;right:auto;
+	width:auto;max-width:calc(100% - 16px);
+	border-radius:8px;
+	box-shadow:0 2px 6px rgba(0,0,0,.18);
+}
+.promeng-thumb.promeng-pos-top-right .promeng-banner{top:8px;right:8px;}
+.promeng-thumb.promeng-pos-top-left .promeng-banner{top:8px;left:8px;}
+
 /* Inline pill badge fallback */
 .promeng-badge{display:inline-block;background:#16a34a;color:#fff;font-size:11px;
 	font-weight:600;padding:2px 8px;border-radius:999px;margin-bottom:6px;}

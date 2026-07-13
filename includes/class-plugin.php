@@ -45,6 +45,9 @@ class Plugin {
 			( new Influencer() )->hooks();
 		}
 
+		// Store-wide settings (catalog label position, …).
+		( new Settings() )->hooks();
+
 		// Giorgio sync layer (inbound REST push, outbound usage reporting).
 		( new \PromoEngine\Giorgio\Settings() )->hooks();
 		( new \PromoEngine\Giorgio\Rest() )->hooks();

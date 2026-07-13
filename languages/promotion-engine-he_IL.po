@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Promotion Engine 0.9.6\n"
+"Project-Id-Version: Promotion Engine 0.9.7\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -804,3 +804,39 @@ msgstr "ללקוחות רשומים בלבד"
 
 msgid "Guests only (not logged in)"
 msgstr "לאורחים בלבד (לא מחוברים)"
+
+msgid "Settings"
+msgstr "הגדרות"
+
+msgid "Sale"
+msgstr "מבצע"
+
+msgid "Catalog label position"
+msgstr "מיקום תווית המבצע בקטלוג"
+
+msgid "Where the promotion label sits on the product image in shop and category grids. This is a store-wide setting and applies to every promotion label."
+msgstr "מיקום תווית המבצע על תמונת המוצר ברשתות החנות והקטגוריות. זו הגדרה כלל-חנותית שחלה על כל תוויות המבצעים."
+
+msgid "Bottom (full width)"
+msgstr "למטה (רוחב מלא)"
+
+msgid "A full-width banner across the bottom of the image (the current default)."
+msgstr "באנר ברוחב מלא בתחתית התמונה (ברירת המחדל הנוכחית)."
+
+msgid "Top (full width)"
+msgstr "למעלה (רוחב מלא)"
+
+msgid "A full-width banner across the top of the image."
+msgstr "באנר ברוחב מלא בראש התמונה."
+
+msgid "Top right"
+msgstr "למעלה מימין"
+
+msgid "A compact, text-sized tag in the top-right corner, with a small margin."
+msgstr "תווית קומפקטית בגודל הטקסט בפינה הימנית-עליונה, עם מרווח קטן."
+
+msgid "Top left"
+msgstr "למעלה משמאל"
+
+msgid "A compact, text-sized tag in the top-left corner, with a small margin."
+msgstr "תווית קומפקטית בגודל הטקסט בפינה השמאלית-עליונה, עם מרווח קטן."

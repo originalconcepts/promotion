@@ -229,7 +229,8 @@ class Catalog {
 		if ( ! $label ) {
 			return $html;
 		}
-		return '<span class="promeng-thumb"><span class="promeng-banner">' . esc_html( $label ) . '</span>' . $html . '</span>';
+		$position = Settings::label_position();
+		return '<span class="promeng-thumb promeng-pos-' . esc_attr( $position ) . '"><span class="promeng-banner">' . esc_html( $label ) . '</span>' . $html . '</span>';
 	}
 
 	/**
