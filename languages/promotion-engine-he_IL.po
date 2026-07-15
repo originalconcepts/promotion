@@ -840,3 +840,6 @@ msgstr "למעלה משמאל"
 
 msgid "A compact, text-sized tag in the top-left corner, with a small margin."
 msgstr "תווית קומפקטית בגודל הטקסט בפינה השמאלית-עליונה, עם מרווח קטן."
+
+msgid "pcs"
+msgstr "יח׳"

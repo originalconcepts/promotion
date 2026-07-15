@@ -89,7 +89,10 @@ class Cart {
 		add_action( 'woocommerce_cart_item_restored', array( $this, 'sync_auto_gifts' ), 20 );
 		add_action( 'woocommerce_after_cart_item_quantity_update', array( $this, 'sync_auto_gifts' ), 20 );
 		// Gift lines are managed by the plugin: lock qty, hide remove, badge it.
-		add_filter( 'woocommerce_cart_item_quantity', array( $this, 'gift_quantity_html' ), 10, 3 );
+		// High priority so a gift line's quantity wins over unit/weight plugins
+		// (e.g. OC Sale Units, which otherwise renders it as a kg weight).
+		add_filter( 'woocommerce_cart_item_quantity', array( $this, 'gift_quantity_html' ), 999, 3 );
+		add_filter( 'woocommerce_widget_cart_item_quantity', array( $this, 'gift_widget_quantity_html' ), 999, 3 );
 		add_filter( 'woocommerce_cart_item_remove_link', array( $this, 'gift_remove_link' ), 10, 2 );
 		add_filter( 'woocommerce_cart_item_name', array( $this, 'gift_item_name' ), 10, 2 );
 	}
@@ -392,6 +395,11 @@ class Cart {
 			if ( (float) $info['saved'] <= 0 ) {
 				continue;
 			}
+			// A free gift is its own reward — it already shows a "gift" tag on the
+			// line — so don't also list it as a "you saved" amount.
+			if ( $this->is_free_gift_promo( isset( $info['promotion'] ) ? $info['promotion'] : null ) ) {
+				continue;
+			}
 			$total += (float) $info['saved'];
 			$name   = $info['promotion']->name ? $info['promotion']->name : $info['label'];
 			$rows  .= '<li><span class="promeng-pop-name">' . esc_html( $name ) . '</span>'
@@ -401,6 +409,18 @@ class Cart {
 			return null;
 		}
 		return array( 'total' => $total, 'rows' => $rows );
+	}
+
+	/**
+	 * Is this an auto-added free gift promotion (Buy X → get a specific product
+	 * free)? Its saving is represented by the gift line itself, so it is kept out
+	 * of the "you saved" summary.
+	 */
+	private function is_free_gift_promo( $promotion ) {
+		return $promotion instanceof \PromoEngine\Promotion
+			&& 'buy_x_get_y' === $promotion->type
+			&& 'free' === $promotion->get( 'benefit_type', 'free' )
+			&& 'products' === $promotion->get( 'benefit_applies_to', 'products' );
 	}
 
 	private function savings_info_svg() {
@@ -568,9 +588,29 @@ class Cart {
 	 */
 	public function gift_quantity_html( $html, $cart_item_key, $cart_item ) {
 		if ( ! empty( $cart_item['promeng_gift'] ) ) {
-			return esc_html( $cart_item['quantity'] );
+			return $this->gift_quantity_label( $cart_item );
 		}
 		return $html;
+	}
+
+	/**
+	 * Same, for the mini-cart / side drawer (different filter + argument order).
+	 */
+	public function gift_widget_quantity_html( $html, $cart_item, $cart_item_key ) {
+		if ( ! empty( $cart_item['promeng_gift'] ) ) {
+			return $this->gift_quantity_label( $cart_item );
+		}
+		return $html;
+	}
+
+	/**
+	 * A gift line is a fixed, non-editable count of units — render it as
+	 * "N pcs", never as a weight.
+	 */
+	private function gift_quantity_label( $cart_item ) {
+		$qty = (float) $cart_item['quantity'];
+		$n   = ( floor( $qty ) === $qty ) ? (string) (int) $qty : (string) $qty;
+		return '<span class="quantity promeng-gift-qty">' . esc_html( $n . ' ' . __( 'pcs', 'promotion-engine' ) ) . '</span>';
 	}
 
 	/**
