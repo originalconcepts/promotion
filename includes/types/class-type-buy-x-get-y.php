@@ -32,6 +32,25 @@ class BuyXGetY implements Type {
 		return 'buy_x_get_y';
 	}
 
+	/**
+	 * How many times the "buy" side is satisfied — the number of benefits earned.
+	 *
+	 *  - Amount-gated with no per-item multiple ("spend over X, get Y"): once per
+	 *    full multiple of the spend threshold, so a ₪1,869 cart over a ₪1,000
+	 *    threshold earns ONE benefit — not one per item in the cart.
+	 *  - Otherwise ("buy N, get Y"): once per buy_quantity qualifying items.
+	 *
+	 * Set "limit per order" to cap it (e.g. exactly one gift per order).
+	 *
+	 * @return int
+	 */
+	private function fulfillments( $buy_qty, $buy_quantity, $min_amount, $threshold ) {
+		if ( $min_amount > 0 && $buy_quantity <= 1 ) {
+			return (int) floor( $threshold / $min_amount );
+		}
+		return (int) floor( $buy_qty / $buy_quantity );
+	}
+
 	public function evaluate( Promotion $promotion, array $cart, array $context ) {
 		$result = array(
 			'qualifies'      => false,
@@ -130,9 +149,9 @@ class BuyXGetY implements Type {
 		// How many units are given for free / discounted.
 		$benefit_quantity = max( 1, (int) $promotion->get( 'benefit_quantity', 1 ) );
 		if ( 'products' === $benefit_applies ) {
-			// A distinct benefit product (a separate gift): every buy_quantity
-			// purchased earns benefit_quantity free units of that product.
-			$fulfillments = (int) floor( $buy_qty / $buy_quantity );
+			// A distinct benefit product (a separate gift): each fulfillment earns
+			// benefit_quantity free units of it (amount- or item-count-driven).
+			$fulfillments = $this->fulfillments( $buy_qty, $buy_quantity, $min_amount, $threshold );
 		} else {
 			// Shared pool (same / all / category): each fulfillment consumes a
 			// whole group of buy_quantity paid + benefit_quantity free items from
@@ -304,7 +323,7 @@ class BuyXGetY implements Type {
 		if ( $min_amount && $threshold < $min_amount ) {
 			return null;
 		}
-		$fulfillments = (int) floor( $buy_qty / $buy_quantity );
+		$fulfillments = $this->fulfillments( $buy_qty, $buy_quantity, $min_amount, $threshold );
 		if ( $fulfillments < 1 ) {
 			return null;
 		}

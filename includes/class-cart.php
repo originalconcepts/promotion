@@ -231,7 +231,16 @@ class Cart {
 	 * Cart line unit price: show original struck-through + discounted.
 	 */
 	public function cart_item_price_html( $price_html, $cart_item, $cart_item_key ) {
-		if ( ! isset( $cart_item['promeng_base_price'] ) || ! ( $cart_item['data'] instanceof \WC_Product ) ) {
+		if ( ! ( $cart_item['data'] instanceof \WC_Product ) ) {
+			return $price_html;
+		}
+		// Auto-added free gift: show a marketing "Free gift" tag (works on themes
+		// that render the price filter but not the cart-item-name filter).
+		if ( ! empty( $cart_item['promeng_gift'] ) ) {
+			$base = isset( $cart_item['promeng_base_price'] ) ? (float) $cart_item['promeng_base_price'] : (float) $cart_item['data']->get_price();
+			return $this->gift_price_html( $base );
+		}
+		if ( ! isset( $cart_item['promeng_base_price'] ) ) {
 			return $price_html;
 		}
 		$base    = (float) $cart_item['promeng_base_price'];
@@ -246,7 +255,15 @@ class Cart {
 	 * Cart line subtotal: show original struck-through + discounted (x qty).
 	 */
 	public function cart_item_subtotal_html( $subtotal_html, $cart_item, $cart_item_key ) {
-		if ( ! isset( $cart_item['promeng_base_price'] ) || ! ( $cart_item['data'] instanceof \WC_Product ) ) {
+		if ( ! ( $cart_item['data'] instanceof \WC_Product ) ) {
+			return $subtotal_html;
+		}
+		if ( ! empty( $cart_item['promeng_gift'] ) ) {
+			$qty  = (float) $cart_item['quantity'];
+			$base = ( isset( $cart_item['promeng_base_price'] ) ? (float) $cart_item['promeng_base_price'] : (float) $cart_item['data']->get_price() ) * $qty;
+			return $this->gift_price_html( $base );
+		}
+		if ( ! isset( $cart_item['promeng_base_price'] ) ) {
 			return $subtotal_html;
 		}
 		$qty     = (float) $cart_item['quantity'];
@@ -261,6 +278,20 @@ class Cart {
 	private function before_after_html( $base, $current ) {
 		return '<span class="promeng-was" style="text-decoration:line-through;color:#6b7280;opacity:1;margin-inline-end:6px;">' . wp_kses_post( wc_price( $base ) ) . '</span> '
 			. '<span class="promeng-now" style="color:#dc2626;font-weight:700;">' . wp_kses_post( wc_price( $current ) ) . '</span>';
+	}
+
+	/**
+	 * Price/subtotal markup for an auto-added free gift line: the original value
+	 * struck through, plus a "Free gift" tag. Shown via the cart-item price and
+	 * subtotal filters so it appears even on themes that render the product name
+	 * without the woocommerce_cart_item_name filter.
+	 */
+	private function gift_price_html( $base ) {
+		$tag = '<span class="promeng-gift-badge">🎁 ' . esc_html__( 'Free gift', 'promotion-engine' ) . '</span>';
+		if ( $base > 0 ) {
+			return '<span class="promeng-was" style="text-decoration:line-through;color:#6b7280;margin-inline-end:6px;">' . wp_kses_post( wc_price( $base ) ) . '</span> ' . $tag;
+		}
+		return $tag;
 	}
 
 	/**
