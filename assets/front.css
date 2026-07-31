@@ -63,29 +63,34 @@
 .promeng-savings-line .promeng-savings-amount,
 .promeng-savings-line .promeng-savings-amount .woocommerce-Price-amount,
 .promeng-savings-line .promeng-savings-amount bdi{color:inherit !important;font-weight:700;white-space:nowrap;}
+/* LTR on the amount CONTAINER (not just the inner price span) so a leading
+   minus — whether it's a raw text node or inside wc_price — sits on the left. */
+.promeng-savings-line .promeng-savings-amount,
 .promeng-savings-line .promeng-savings-amount .woocommerce-Price-amount{direction:ltr;unicode-bidi:isolate;}
 
-/* Checkout: WooCommerce renders the whole-cart discount as a fee row. Some custom
-   themes copied WC's <th>/<td> fee markup into a totals table whose other rows are
-   a single flex cell — force the fee row to lay out cleanly and push the amount to
-   the same far edge as the other totals amounts. */
-.woocommerce-checkout-review-order-table tr.fee,
-.woocommerce-checkout .shop_table tr.fee,
-.cart_totals .table-totals tr.fee{
-	display:flex !important;align-items:center;justify-content:space-between;gap:8px;width:100%;box-sizing:border-box;padding:0 !important;}
+/* Checkout: WooCommerce renders the whole-cart discount as a fee row. This theme's
+   normal totals rows are a single <td> holding two floated <span>s (label floats to
+   the start with padding-left:10px, amount floats to the end with padding-right:10px,
+   18px / #102326 / bold, on a #f7f7f7 background). WC's fee row is instead <th>+<td>,
+   so it doesn't inherit any of that and drifts out of line. We lay the fee row out as
+   a full-width flex row and dress the th/td to match a normal row's two spans exactly,
+   so the label starts and the amount ends on the same lines as the other totals. */
+.woocommerce-checkout-review-order-table tr.fee{
+	display:flex !important;align-items:center;justify-content:space-between;width:100%;box-sizing:border-box;
+	padding:0 0 10px 0 !important;}
 .woocommerce-checkout-review-order-table tr.fee th,
-.woocommerce-checkout .shop_table tr.fee th,
-.cart_totals .table-totals tr.fee th{
-	flex:0 1 auto;display:inline-block !important;border:0 !important;background:none !important;margin:0 !important;
-	width:auto !important;padding:8px 0 !important;font-weight:700 !important;text-align:start;font-size:inherit;color:inherit;}
-.woocommerce-checkout-review-order-table tr.fee td,
-.woocommerce-checkout .shop_table tr.fee td,
-.cart_totals .table-totals tr.fee td{
-	flex:0 0 auto;display:inline-block !important;border:0 !important;background:none !important;margin:0 !important;
-	width:auto !important;padding:8px 0 !important;font-weight:700 !important;text-align:end;white-space:nowrap;color:inherit !important;font-size:inherit;}
+.woocommerce-checkout-review-order-table tr.fee td{
+	flex:0 1 auto;display:block !important;border:0 !important;margin:0 !important;width:auto !important;
+	background-color:#f7f7f7;position:relative;z-index:1;
+	font-size:18px !important;color:#102326 !important;font-weight:bold !important;}
+.woocommerce-checkout-review-order-table tr.fee th{padding:0 0 0 10px !important;text-align:start;}
+.woocommerce-checkout-review-order-table tr.fee td{padding:0 10px 0 0 !important;text-align:end;white-space:nowrap;}
 .woocommerce-checkout-review-order-table tr.fee td .woocommerce-Price-amount,
-.woocommerce-checkout .shop_table tr.fee td .woocommerce-Price-amount,
-.cart_totals .table-totals tr.fee td .woocommerce-Price-amount{color:inherit !important;direction:ltr;unicode-bidi:isolate;}
+.woocommerce-checkout-review-order-table tr.fee td bdi{color:#102326 !important;}
+.woocommerce-checkout-review-order-table tr.fee td .woocommerce-Price-amount{direction:ltr;unicode-bidi:isolate;}
+/* No partial leader line on the fee row (the theme's td:after only spans one cell). */
+.woocommerce-checkout-review-order-table tr.fee td:after,
+.woocommerce-checkout-review-order-table tr.fee th:after{display:none !important;}
 
 /* Mini-cart subtotal on a single line (label at the start, amount at the end) */
 .woocommerce-mini-cart__total.total,
