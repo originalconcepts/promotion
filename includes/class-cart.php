@@ -450,7 +450,9 @@ class Cart {
 		foreach ( $data['items'] as $item ) {
 			$html .= '<tr class="promeng-savings promeng-cart-discount">'
 				. '<th class="promeng-savings-label">' . esc_html( $item['name'] ) . '</th>'
-				. '<td class="promeng-savings-amount" data-title="' . esc_attr( $item['name'] ) . '">-' . wp_kses_post( wc_price( $item['saved'] ) ) . '</td>'
+				// wc_price( -amount ) formats the minus the same way WooCommerce does
+				// on the checkout fee row, so the sign sits on the same side everywhere.
+				. '<td class="promeng-savings-amount" data-title="' . esc_attr( $item['name'] ) . '">' . wp_kses_post( wc_price( - $item['saved'] ) ) . '</td>'
 				. '</tr>';
 		}
 		echo $html; // phpcs:ignore WordPress.Security.EscapeOutput
@@ -489,7 +491,7 @@ class Cart {
 			// full-width flex line.
 			$out .= '<span class="promeng-savings-line">'
 				. '<span class="promeng-savings-label">' . esc_html( $item['name'] ) . '</span>'
-				. '<span class="promeng-savings-amount">-' . wp_kses_post( wc_price( $item['saved'] ) ) . '</span>'
+				. '<span class="promeng-savings-amount">' . wp_kses_post( wc_price( - $item['saved'] ) ) . '</span>'
 				. '</span>';
 		}
 		return $out;
