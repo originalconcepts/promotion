@@ -443,16 +443,15 @@ class Cart {
 		}
 		$this->savings_rendered = true;
 
-		// One row per promotion, each labelled with the promotion's name so the
-		// shopper sees what the discount is. A single full-width cell (colspan)
-		// with flex content renders cleanly in any totals table — one-cell or
-		// two-cell — instead of a <th>/<td> pair that breaks custom layouts.
+		// One row per promotion, labelled with the promotion's name. Uses the same
+		// <th>/<td> structure as the standard WooCommerce cart-totals rows so it
+		// lines up with the subtotal / total rows around it.
 		$html = '';
 		foreach ( $data['items'] as $item ) {
-			$html .= '<tr class="promeng-savings"><td colspan="10" class="promeng-savings-cell" data-title="' . esc_attr( $item['name'] ) . '">'
-				. '<span class="promeng-savings-label">' . esc_html( $item['name'] ) . '</span>'
-				. '<span class="promeng-savings-amount">-' . wp_kses_post( wc_price( $item['saved'] ) ) . '</span>'
-				. '</td></tr>';
+			$html .= '<tr class="promeng-savings promeng-cart-discount">'
+				. '<th class="promeng-savings-label">' . esc_html( $item['name'] ) . '</th>'
+				. '<td class="promeng-savings-amount" data-title="' . esc_attr( $item['name'] ) . '">-' . wp_kses_post( wc_price( $item['saved'] ) ) . '</td>'
+				. '</tr>';
 		}
 		echo $html; // phpcs:ignore WordPress.Security.EscapeOutput
 	}
@@ -484,10 +483,12 @@ class Cart {
 
 		$out = '';
 		foreach ( $data['items'] as $item ) {
-			$out .= '<div class="promeng-savings-box">'
-				. '<span class="promeng-savings-box-label">' . esc_html( $item['name'] ) . '</span>'
-				. '<span class="promeng-savings-box-total">-' . wp_kses_post( wc_price( $item['saved'] ) ) . '</span>'
-				. '</div>';
+			// A plain line (label + amount) — like the subtotal line — rather than a
+			// heavy boxed callout, so it reads as part of the mini-cart totals.
+			$out .= '<p class="woocommerce-mini-cart__total promeng-savings-line">'
+				. '<span class="promeng-savings-label">' . esc_html( $item['name'] ) . '</span>'
+				. '<span class="promeng-savings-amount">-' . wp_kses_post( wc_price( $item['saved'] ) ) . '</span>'
+				. '</p>';
 		}
 		return $out;
 	}

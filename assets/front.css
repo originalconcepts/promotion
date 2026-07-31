@@ -39,39 +39,36 @@
 .promeng-was{color:#6b7280;margin-inline-end:6px;text-decoration:line-through;}
 .promeng-now{text-decoration:none;font-weight:700;color:#dc2626;}
 
-/* Cart / checkout savings line — one full-width flex cell, robust across themes
-   (works whether the theme's totals rows are two-cell <th>/<td> or single-cell). */
-.promeng-savings .promeng-savings-cell{
-	display:flex !important;align-items:center;justify-content:space-between;gap:10px;
-	color:#16a34a;font-weight:700;text-align:start;width:100%;box-sizing:border-box;}
-.promeng-savings-amount{color:#16a34a;font-weight:800;white-space:nowrap;}
+/* ---- Discount / "you saved" line ---- */
+/* Cart page: a normal <th>/<td> totals row, coloured as a discount so it lines up
+   with the subtotal / total rows around it. */
+.promeng-savings.promeng-cart-discount th,
+.promeng-savings.promeng-cart-discount td{color:#16a34a;font-weight:700;}
+.promeng-savings.promeng-cart-discount td{text-align:end;white-space:nowrap;}
 
-/* Savings box (mini-cart / shortcode / manual placement) — one clean line */
-.promeng-savings-box{display:flex;align-items:center;justify-content:space-between;gap:10px;
-	border:1px solid #bbf7d0;background:#f0fdf4;border-radius:10px;padding:10px 14px;margin:10px 0;
-	color:#15803d;font-weight:700;font-size:1em;}
-.promeng-savings-box-total{color:#16a34a;font-weight:800;white-space:nowrap;}
+/* Mini-cart: a plain totals line (reuses the theme's mini-cart total row style). */
+.promeng-savings-line{display:flex !important;align-items:center;justify-content:space-between;gap:10px;
+	margin:6px 0;color:#16a34a;font-weight:700;}
+.promeng-savings-line .promeng-savings-amount{color:#16a34a;font-weight:800;white-space:nowrap;}
 
-/* Robustness: some custom themes copied WooCommerce's <th>/<td> fee-row markup
-   into a totals table whose other rows are a single flex cell. The plugin applies
-   whole-cart discounts as a negative fee, so without this the discount row breaks
-   the totals table. Force fee rows to lay out cleanly (label start, amount end). */
+/* Checkout: WooCommerce renders the whole-cart discount as a fee row. Some custom
+   themes copied WC's <th>/<td> fee markup into a totals table whose other rows are
+   a single flex cell — force the fee row to lay out cleanly and push the amount to
+   the same edge as the other totals amounts (label grows, amount hugs the end). */
 .woocommerce-checkout-review-order-table tr.fee,
 .woocommerce-checkout .shop_table tr.fee,
 .cart_totals .table-totals tr.fee{
-	display:flex !important;align-items:center;justify-content:space-between;gap:10px;width:100%;box-sizing:border-box;}
+	display:flex !important;align-items:center;gap:10px;width:100%;box-sizing:border-box;}
 .woocommerce-checkout-review-order-table tr.fee th,
-.woocommerce-checkout-review-order-table tr.fee td,
 .woocommerce-checkout .shop_table tr.fee th,
-.woocommerce-checkout .shop_table tr.fee td,
-.cart_totals .table-totals tr.fee th,
-.cart_totals .table-totals tr.fee td{
-	display:inline-block !important;border:0 !important;background:none !important;
-	width:auto !important;padding:8px 0 !important;font-weight:700 !important;text-align:start;
-	font-size:inherit;color:#15803d;}
+.cart_totals .table-totals tr.fee th{
+	flex:1 1 auto;display:inline-block !important;border:0 !important;background:none !important;
+	width:auto !important;padding:8px 0 !important;font-weight:700 !important;text-align:start;font-size:inherit;color:#15803d;}
 .woocommerce-checkout-review-order-table tr.fee td,
 .woocommerce-checkout .shop_table tr.fee td,
-.cart_totals .table-totals tr.fee td{text-align:end;white-space:nowrap;color:#16a34a;}
+.cart_totals .table-totals tr.fee td{
+	flex:0 0 auto;display:inline-block !important;border:0 !important;background:none !important;
+	width:auto !important;padding:8px 0 !important;font-weight:700 !important;text-align:end;white-space:nowrap;color:#16a34a;font-size:inherit;}
 
 /* Mini-cart subtotal on a single line (label at the start, amount at the end) */
 .woocommerce-mini-cart__total.total,
