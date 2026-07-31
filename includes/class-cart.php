@@ -483,12 +483,14 @@ class Cart {
 
 		$out = '';
 		foreach ( $data['items'] as $item ) {
-			// A plain line (label + amount) — like the subtotal line — rather than a
-			// heavy boxed callout, so it reads as part of the mini-cart totals.
-			$out .= '<p class="woocommerce-mini-cart__total promeng-savings-line">'
+			// A plain line (promotion name + amount), like the cart-page discount
+			// row. A <span> (not <p>/<div>) so it stays valid even when the theme
+			// fires the mini-cart total hook from inside a <p> — the CSS makes it a
+			// full-width flex line.
+			$out .= '<span class="promeng-savings-line">'
 				. '<span class="promeng-savings-label">' . esc_html( $item['name'] ) . '</span>'
 				. '<span class="promeng-savings-amount">-' . wp_kses_post( wc_price( $item['saved'] ) ) . '</span>'
-				. '</p>';
+				. '</span>';
 		}
 		return $out;
 	}
