@@ -40,25 +40,30 @@
 .promeng-now{text-decoration:none;font-weight:700;color:#dc2626;}
 
 /* ---- Discount / "you saved" line ---- */
-/* Cart page: a normal <th>/<td> totals row, coloured as a discount so it lines up
-   with the subtotal / total rows around it. */
-.promeng-savings.promeng-cart-discount th{color:#15803d;font-weight:700;}
+/* One consistent look across cart page, mini-cart and checkout:
+   - all text (label + amount) uses the theme's normal totals colour (black),
+     never green and never the theme's red negative-amount styling;
+   - the amount is forced LTR so the minus sits to the LEFT of the number
+     (-11.70 ₪) instead of being flipped to the right by the RTL context. */
+
+/* Cart page: a normal <th>/<td> totals row that lines up with subtotal / total. */
+.promeng-savings.promeng-cart-discount th{color:inherit;font-weight:700;}
 .promeng-savings.promeng-cart-discount td{text-align:end;white-space:nowrap;}
-/* Force the discount amount (and WooCommerce's inner price/bdi wrappers) green,
-   so the minus sign isn't coloured red by the theme's negative-amount styling. */
 .promeng-savings.promeng-cart-discount td,
 .promeng-savings.promeng-cart-discount td .woocommerce-Price-amount,
-.promeng-savings.promeng-cart-discount td bdi{color:#16a34a !important;font-weight:700;}
+.promeng-savings.promeng-cart-discount td bdi{color:inherit !important;font-weight:700;}
+.promeng-savings.promeng-cart-discount td .woocommerce-Price-amount{direction:ltr;unicode-bidi:isolate;}
 
 /* Mini-cart: a plain totals line (one per promotion). It sits inside the theme's
    mini-cart total <p> (which we flex + wrap below), so flex-basis:100% forces it
    onto its own full-width row — pushing the subtotal onto the next line. */
 .promeng-savings-line{display:flex !important;flex:1 1 100%;align-items:center;justify-content:space-between;gap:10px;
 	margin:2px 0;font-weight:600;}
-.promeng-savings-line .promeng-savings-label{color:#15803d;font-weight:600;}
+.promeng-savings-line .promeng-savings-label{color:inherit;font-weight:600;}
 .promeng-savings-line .promeng-savings-amount,
 .promeng-savings-line .promeng-savings-amount .woocommerce-Price-amount,
-.promeng-savings-line .promeng-savings-amount bdi{color:#16a34a !important;font-weight:700;white-space:nowrap;}
+.promeng-savings-line .promeng-savings-amount bdi{color:inherit !important;font-weight:700;white-space:nowrap;}
+.promeng-savings-line .promeng-savings-amount .woocommerce-Price-amount{direction:ltr;unicode-bidi:isolate;}
 
 /* Checkout: WooCommerce renders the whole-cart discount as a fee row. Some custom
    themes copied WC's <th>/<td> fee markup into a totals table whose other rows are
@@ -72,12 +77,15 @@
 .woocommerce-checkout .shop_table tr.fee th,
 .cart_totals .table-totals tr.fee th{
 	flex:0 1 auto;display:inline-block !important;border:0 !important;background:none !important;margin:0 !important;
-	width:auto !important;padding:8px 0 !important;font-weight:700 !important;text-align:start;font-size:inherit;color:#15803d;}
+	width:auto !important;padding:8px 0 !important;font-weight:700 !important;text-align:start;font-size:inherit;color:inherit;}
 .woocommerce-checkout-review-order-table tr.fee td,
 .woocommerce-checkout .shop_table tr.fee td,
 .cart_totals .table-totals tr.fee td{
 	flex:0 0 auto;display:inline-block !important;border:0 !important;background:none !important;margin:0 !important;
-	width:auto !important;padding:8px 0 !important;font-weight:700 !important;text-align:end;white-space:nowrap;color:#16a34a !important;font-size:inherit;}
+	width:auto !important;padding:8px 0 !important;font-weight:700 !important;text-align:end;white-space:nowrap;color:inherit !important;font-size:inherit;}
+.woocommerce-checkout-review-order-table tr.fee td .woocommerce-Price-amount,
+.woocommerce-checkout .shop_table tr.fee td .woocommerce-Price-amount,
+.cart_totals .table-totals tr.fee td .woocommerce-Price-amount{color:inherit !important;direction:ltr;unicode-bidi:isolate;}
 
 /* Mini-cart subtotal on a single line (label at the start, amount at the end) */
 .woocommerce-mini-cart__total.total,
