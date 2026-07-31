@@ -46,10 +46,13 @@
 .promeng-savings.promeng-cart-discount td{color:#16a34a;font-weight:700;}
 .promeng-savings.promeng-cart-discount td{text-align:end;white-space:nowrap;}
 
-/* Mini-cart: a plain totals line (reuses the theme's mini-cart total row style). */
-.promeng-savings-line{display:flex !important;align-items:center;justify-content:space-between;gap:10px;
-	margin:6px 0;color:#16a34a;font-weight:700;}
-.promeng-savings-line .promeng-savings-amount{color:#16a34a;font-weight:800;white-space:nowrap;}
+/* Mini-cart: a plain totals line (one per promotion). It sits inside the theme's
+   mini-cart total <p> (which we flex + wrap below), so flex-basis:100% forces it
+   onto its own full-width row — pushing the subtotal onto the next line. */
+.promeng-savings-line{display:flex !important;flex:1 1 100%;align-items:center;justify-content:space-between;gap:10px;
+	margin:2px 0;color:#16a34a;font-weight:600;}
+.promeng-savings-line .promeng-savings-label{font-weight:600;}
+.promeng-savings-line .promeng-savings-amount{color:#16a34a;font-weight:700;white-space:nowrap;}
 
 /* Checkout: WooCommerce renders the whole-cart discount as a fee row. Some custom
    themes copied WC's <th>/<td> fee markup into a totals table whose other rows are
