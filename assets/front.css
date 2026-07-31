@@ -39,16 +39,38 @@
 .promeng-was{color:#6b7280;margin-inline-end:6px;text-decoration:line-through;}
 .promeng-now{text-decoration:none;font-weight:700;color:#dc2626;}
 
-/* Cart savings line */
-.promeng-savings th,.promeng-savings td{color:#16a34a;font-weight:600;}
+/* Cart / checkout savings line — one full-width flex cell, robust across themes
+   (works whether the theme's totals rows are two-cell <th>/<td> or single-cell). */
+.promeng-savings .promeng-savings-cell{
+	display:flex !important;align-items:center;justify-content:space-between;gap:10px;
+	color:#16a34a;font-weight:700;text-align:start;width:100%;box-sizing:border-box;}
+.promeng-savings-amount{color:#16a34a;font-weight:800;white-space:nowrap;}
 
-/* Savings box (shortcode / manual placement) */
-.promeng-savings-box{border:1px solid #bbf7d0;background:#f0fdf4;border-radius:10px;padding:12px 14px;margin:14px 0;}
-.promeng-savings-box-head{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#15803d;font-weight:700;font-size:1.02em;}
-.promeng-savings-box-total{color:#16a34a;font-weight:800;}
-.promeng-savings-box-list{list-style:none;margin:8px 0 0;padding:0;}
-.promeng-savings-box-list li{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#3f6212;font-size:.92em;padding:2px 0;}
-.promeng-savings-box-list .promeng-pop-amt{color:#16a34a;font-weight:600;}
+/* Savings box (mini-cart / shortcode / manual placement) — one clean line */
+.promeng-savings-box{display:flex;align-items:center;justify-content:space-between;gap:10px;
+	border:1px solid #bbf7d0;background:#f0fdf4;border-radius:10px;padding:10px 14px;margin:10px 0;
+	color:#15803d;font-weight:700;font-size:1em;}
+.promeng-savings-box-total{color:#16a34a;font-weight:800;white-space:nowrap;}
+
+/* Robustness: some custom themes copied WooCommerce's <th>/<td> fee-row markup
+   into a totals table whose other rows are a single flex cell. The plugin applies
+   whole-cart discounts as a negative fee, so without this the discount row breaks
+   the totals table. Force fee rows to lay out cleanly (label start, amount end). */
+.woocommerce-checkout-review-order-table tr.fee,
+.woocommerce-checkout .shop_table tr.fee,
+.cart_totals .table-totals tr.fee{
+	display:flex !important;align-items:center;justify-content:space-between;gap:10px;width:100%;box-sizing:border-box;}
+.woocommerce-checkout-review-order-table tr.fee th,
+.woocommerce-checkout-review-order-table tr.fee td,
+.woocommerce-checkout .shop_table tr.fee th,
+.woocommerce-checkout .shop_table tr.fee td,
+.cart_totals .table-totals tr.fee th,
+.cart_totals .table-totals tr.fee td{
+	display:inline-block !important;border:0 !important;background:none !important;
+	width:auto !important;padding:4px 0 !important;font-weight:600;text-align:start;}
+.woocommerce-checkout-review-order-table tr.fee td,
+.woocommerce-checkout .shop_table tr.fee td,
+.cart_totals .table-totals tr.fee td{text-align:end;white-space:nowrap;}
 
 /* Savings line: info button + applied-promotions popup */
 .promeng-savings th{position:relative;}

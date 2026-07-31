@@ -443,14 +443,12 @@ class Cart {
 		}
 		$this->savings_rendered = true;
 
-		echo '<tr class="promeng-savings"><th>'
-			. esc_html__( 'You saved on this purchase', 'promotion-engine' )
-			. ' <button type="button" class="promeng-info" aria-label="' . esc_attr__( 'Applied promotions', 'promotion-engine' ) . '">' . $this->savings_info_svg() . '</button>' // phpcs:ignore WordPress.Security.EscapeOutput
-			. '</th><td data-title="' . esc_attr__( 'You saved on this purchase', 'promotion-engine' ) . '">'
-			. wp_kses_post( wc_price( $data['total'] ) )
-			. '<div class="promeng-popup" role="dialog">'
-			. '<div class="promeng-popup-title">' . esc_html__( 'Applied promotions', 'promotion-engine' ) . '</div>'
-			. '<ul>' . $data['rows'] . '</ul></div>' // phpcs:ignore WordPress.Security.EscapeOutput
+		// A single full-width cell (colspan) with flex content renders cleanly in
+		// any totals table — one-cell or two-cell — instead of a <th>/<td> pair
+		// that breaks themes with a custom single-cell totals layout.
+		echo '<tr class="promeng-savings"><td colspan="10" class="promeng-savings-cell" data-title="' . esc_attr__( 'You saved on this purchase', 'promotion-engine' ) . '">'
+			. '<span class="promeng-savings-label">' . esc_html__( 'You saved on this purchase', 'promotion-engine' ) . '</span>'
+			. '<span class="promeng-savings-amount">-' . wp_kses_post( wc_price( $data['total'] ) ) . '</span>'
 			. '</td></tr>';
 	}
 
@@ -480,9 +478,8 @@ class Cart {
 		$this->savings_rendered = true;
 
 		return '<div class="promeng-savings-box">'
-			. '<div class="promeng-savings-box-head"><span>' . esc_html__( 'You saved on this purchase', 'promotion-engine' ) . '</span>'
-			. '<span class="promeng-savings-box-total">' . wp_kses_post( wc_price( $data['total'] ) ) . '</span></div>'
-			. '<ul class="promeng-savings-box-list">' . $data['rows'] . '</ul>'
+			. '<span class="promeng-savings-box-label">' . esc_html__( 'You saved on this purchase', 'promotion-engine' ) . '</span>'
+			. '<span class="promeng-savings-box-total">-' . wp_kses_post( wc_price( $data['total'] ) ) . '</span>'
 			. '</div>';
 	}
 
