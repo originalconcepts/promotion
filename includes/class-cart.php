@@ -40,14 +40,11 @@ class Cart {
 		add_filter( 'woocommerce_cart_item_price', array( $this, 'cart_item_price_html' ), 20, 3 );
 		add_filter( 'woocommerce_cart_item_subtotal', array( $this, 'cart_item_subtotal_html' ), 20, 3 );
 
+		// Cart page: render the discount as a row right inside the totals table,
+		// next to the order total (not at the top of the page). A box after the
+		// totals table is the only fallback, for themes that don't fire the
+		// in-table hook.
 		add_action( 'woocommerce_cart_totals_before_order_total', array( $this, 'render_cart_savings' ) );
-		// Box fallbacks for themes that don't fire the totals-table hook — wired
-		// to the very same points as the green message box (which renders fine on
-		// these themes), so "You saved" shows in the same spot and style.
-		add_action( 'woocommerce_before_cart', array( $this, 'render_cart_savings_box' ), 22 );
-		add_action( 'woocommerce_before_cart_table', array( $this, 'render_cart_savings_box' ), 22 );
-		add_action( 'woocommerce_before_cart_totals', array( $this, 'render_cart_savings_box' ), 6 );
-		add_action( 'woocommerce_proceed_to_checkout', array( $this, 'render_cart_savings_box' ), 5 );
 		add_action( 'woocommerce_after_cart_totals', array( $this, 'render_cart_savings_box' ), 20 );
 		// Mini-cart / side-drawer carts (used by many custom storefronts) fire
 		// their own hooks rather than the cart-page ones above.
@@ -390,7 +387,7 @@ class Cart {
 			return null;
 		}
 		$total = 0.0;
-		$rows  = '';
+		$items = array();
 		foreach ( $this->last_eval['applied'] as $info ) {
 			if ( (float) $info['saved'] <= 0 ) {
 				continue;
@@ -400,15 +397,18 @@ class Cart {
 			if ( $this->is_free_gift_promo( isset( $info['promotion'] ) ? $info['promotion'] : null ) ) {
 				continue;
 			}
-			$total += (float) $info['saved'];
-			$name   = $info['promotion']->name ? $info['promotion']->name : $info['label'];
-			$rows  .= '<li><span class="promeng-pop-name">' . esc_html( $name ) . '</span>'
-				. '<span class="promeng-pop-amt">-' . wp_kses_post( wc_price( $info['saved'] ) ) . '</span></li>';
+			$total   += (float) $info['saved'];
+			$items[]  = array(
+				// The promotion's own name (e.g. "5% off for members") so the shopper
+				// sees what the discount is, not just a generic "you saved".
+				'name'  => $info['promotion']->name ? $info['promotion']->name : $info['label'],
+				'saved' => (float) $info['saved'],
+			);
 		}
 		if ( $total <= 0 ) {
 			return null;
 		}
-		return array( 'total' => $total, 'rows' => $rows );
+		return array( 'total' => $total, 'items' => $items );
 	}
 
 	/**
@@ -443,13 +443,18 @@ class Cart {
 		}
 		$this->savings_rendered = true;
 
-		// A single full-width cell (colspan) with flex content renders cleanly in
-		// any totals table — one-cell or two-cell — instead of a <th>/<td> pair
-		// that breaks themes with a custom single-cell totals layout.
-		echo '<tr class="promeng-savings"><td colspan="10" class="promeng-savings-cell" data-title="' . esc_attr__( 'You saved on this purchase', 'promotion-engine' ) . '">'
-			. '<span class="promeng-savings-label">' . esc_html__( 'You saved on this purchase', 'promotion-engine' ) . '</span>'
-			. '<span class="promeng-savings-amount">-' . wp_kses_post( wc_price( $data['total'] ) ) . '</span>'
-			. '</td></tr>';
+		// One row per promotion, each labelled with the promotion's name so the
+		// shopper sees what the discount is. A single full-width cell (colspan)
+		// with flex content renders cleanly in any totals table — one-cell or
+		// two-cell — instead of a <th>/<td> pair that breaks custom layouts.
+		$html = '';
+		foreach ( $data['items'] as $item ) {
+			$html .= '<tr class="promeng-savings"><td colspan="10" class="promeng-savings-cell" data-title="' . esc_attr( $item['name'] ) . '">'
+				. '<span class="promeng-savings-label">' . esc_html( $item['name'] ) . '</span>'
+				. '<span class="promeng-savings-amount">-' . wp_kses_post( wc_price( $item['saved'] ) ) . '</span>'
+				. '</td></tr>';
+		}
+		echo $html; // phpcs:ignore WordPress.Security.EscapeOutput
 	}
 
 	/**
@@ -477,10 +482,14 @@ class Cart {
 		}
 		$this->savings_rendered = true;
 
-		return '<div class="promeng-savings-box">'
-			. '<span class="promeng-savings-box-label">' . esc_html__( 'You saved on this purchase', 'promotion-engine' ) . '</span>'
-			. '<span class="promeng-savings-box-total">-' . wp_kses_post( wc_price( $data['total'] ) ) . '</span>'
-			. '</div>';
+		$out = '';
+		foreach ( $data['items'] as $item ) {
+			$out .= '<div class="promeng-savings-box">'
+				. '<span class="promeng-savings-box-label">' . esc_html( $item['name'] ) . '</span>'
+				. '<span class="promeng-savings-box-total">-' . wp_kses_post( wc_price( $item['saved'] ) ) . '</span>'
+				. '</div>';
+		}
+		return $out;
 	}
 
 	/**

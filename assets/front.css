@@ -67,10 +67,16 @@
 .cart_totals .table-totals tr.fee th,
 .cart_totals .table-totals tr.fee td{
 	display:inline-block !important;border:0 !important;background:none !important;
-	width:auto !important;padding:4px 0 !important;font-weight:600;text-align:start;}
+	width:auto !important;padding:8px 0 !important;font-weight:700 !important;text-align:start;
+	font-size:inherit;color:#15803d;}
 .woocommerce-checkout-review-order-table tr.fee td,
 .woocommerce-checkout .shop_table tr.fee td,
-.cart_totals .table-totals tr.fee td{text-align:end;white-space:nowrap;}
+.cart_totals .table-totals tr.fee td{text-align:end;white-space:nowrap;color:#16a34a;}
+
+/* Mini-cart subtotal on a single line (label at the start, amount at the end) */
+.woocommerce-mini-cart__total.total,
+p.woocommerce-mini-cart__total{display:flex !important;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.woocommerce-mini-cart__total .amaout-left:empty{display:none;}
 
 /* Savings line: info button + applied-promotions popup */
 .promeng-savings th{position:relative;}
