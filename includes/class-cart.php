@@ -52,7 +52,9 @@ class Cart {
 		// Mini-cart / side-drawer carts (used by many custom storefronts) fire
 		// their own hooks rather than the cart-page ones above.
 		add_action( 'woocommerce_widget_shopping_cart_before_buttons', array( $this, 'render_cart_savings_box' ), 5 );
-		add_action( 'woocommerce_widget_shopping_cart_total', array( $this, 'render_cart_savings_box' ), 5 );
+		// Priority 15: AFTER WC's subtotal (10), so the mini-cart reads
+		// subtotal → discount → total-after-discount (20).
+		add_action( 'woocommerce_widget_shopping_cart_total', array( $this, 'render_cart_savings_box' ), 15 );
 		add_action( 'woocommerce_after_mini_cart', array( $this, 'render_cart_savings_box' ), 5 );
 		// Mini-cart only: a reconciling "total after discount" line, rendered just
 		// after the subtotal (WC's subtotal is @ priority 10 on this same hook).
