@@ -27,6 +27,9 @@ class Cart {
 	/** @var bool Savings line already rendered this request? */
 	private $savings_rendered = false;
 
+	/** @var bool Mini-cart "total after discount" line already rendered this request? */
+	private $total_after_rendered = false;
+
 	/** @var bool Re-entrancy guard for auto-gift syncing. */
 	private $syncing_gifts = false;
 
@@ -51,6 +54,9 @@ class Cart {
 		add_action( 'woocommerce_widget_shopping_cart_before_buttons', array( $this, 'render_cart_savings_box' ), 5 );
 		add_action( 'woocommerce_widget_shopping_cart_total', array( $this, 'render_cart_savings_box' ), 5 );
 		add_action( 'woocommerce_after_mini_cart', array( $this, 'render_cart_savings_box' ), 5 );
+		// Mini-cart only: a reconciling "total after discount" line, rendered just
+		// after the subtotal (WC's subtotal is @ priority 10 on this same hook).
+		add_action( 'woocommerce_widget_shopping_cart_total', array( $this, 'render_mini_cart_total_after' ), 20 );
 		add_shortcode( 'promeng_savings', array( $this, 'savings_shortcode' ) );
 
 		// Encouragement nudges. Several hook points for theme resilience; a
@@ -495,6 +501,49 @@ class Cart {
 				. '</span>';
 		}
 		return $out;
+	}
+
+	/**
+	 * Mini-cart only: a "total after discount" line, printed just under the subtotal.
+	 *
+	 * The mini-cart shows WooCommerce's cart *subtotal*, which by design excludes cart
+	 * fees — and a whole-cart discount is applied as a negative fee — so the subtotal
+	 * stays at the pre-discount amount. With a discount line sitting above it and no
+	 * final total, the numbers don't reconcile. This adds one line showing what the
+	 * shopper will actually pay for the goods (subtotal + fees), so it all adds up.
+	 *
+	 * Rendered only when a cart-level fee is actually reducing the total; pure line-level
+	 * discounts already show through in the subtotal, so no reconciling line is needed.
+	 */
+	public function render_mini_cart_total_after() {
+		if ( $this->total_after_rendered ) {
+			return;
+		}
+		if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
+			return;
+		}
+		$fee_total = (float) WC()->cart->get_fee_total();
+		if ( $fee_total >= -0.005 ) {
+			return; // No cart-level discount to reconcile.
+		}
+		if ( ! $this->savings_data() ) {
+			return; // Nothing from this plugin to explain.
+		}
+		$this->total_after_rendered = true;
+
+		$incl_tax = WC()->cart->display_prices_including_tax();
+		$net      = (float) WC()->cart->get_subtotal() + $fee_total;
+		if ( $incl_tax ) {
+			$net += (float) WC()->cart->get_subtotal_tax() + (float) WC()->cart->get_fee_tax();
+		}
+		if ( $net < 0 ) {
+			$net = 0.0;
+		}
+
+		echo '<span class="promeng-savings-line promeng-total-after">'
+			. '<span class="promeng-savings-label">' . esc_html__( 'Total after discount', 'promotion-engine' ) . '</span>'
+			. '<span class="promeng-savings-amount">' . wp_kses_post( wc_price( $net ) ) . '</span>'
+			. '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput
 	}
 
 	/**

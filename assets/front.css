@@ -67,6 +67,11 @@
    minus — whether it's a raw text node or inside wc_price — sits on the left. */
 .promeng-savings-line .promeng-savings-amount,
 .promeng-savings-line .promeng-savings-amount .woocommerce-Price-amount{direction:ltr;unicode-bidi:isolate;}
+/* Mini-cart "total after discount": same full-width line, but bold so it reads as a
+   final figure that reconciles the subtotal + discount shown above it. */
+.promeng-total-after,
+.promeng-total-after .promeng-savings-label,
+.promeng-total-after .promeng-savings-amount{font-weight:700;}
 
 /* Checkout: WooCommerce renders the whole-cart discount as a fee row — but its markup
    is <th>label + <td>amount (TWO cells), while every other totals row is a single <td>.

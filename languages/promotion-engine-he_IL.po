@@ -843,3 +843,6 @@ msgstr "תווית קומפקטית בגודל הטקסט בפינה השמאל�
 
 msgid "pcs"
 msgstr "יח׳"
+
+msgid "Total after discount"
+msgstr "סה”כ אחרי הנחה"
