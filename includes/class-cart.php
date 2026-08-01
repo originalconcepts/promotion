@@ -522,20 +522,32 @@ class Cart {
 		if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
 			return;
 		}
-		$fee_total = (float) WC()->cart->get_fee_total();
-		if ( $fee_total >= -0.005 ) {
-			return; // No cart-level discount to reconcile.
-		}
+		// Populate the engine's evaluation (also confirms there is a saving to explain).
 		if ( ! $this->savings_data() ) {
-			return; // Nothing from this plugin to explain.
+			return;
+		}
+		// Only the CART-LEVEL (fee) portion is missing from the subtotal; line-level
+		// discounts already show through it. Read the fee portion straight from the
+		// engine — WooCommerce's get_fee_total() isn't populated while the mini-cart
+		// fragment renders, so relying on it would (wrongly) suppress this line.
+		$cart_fee_savings = 0.0;
+		if ( is_array( $this->last_eval ) && ! empty( $this->last_eval['cart_fees'] ) ) {
+			foreach ( $this->last_eval['cart_fees'] as $fee ) {
+				if ( (float) $fee['amount'] > 0 ) {
+					$cart_fee_savings += (float) $fee['amount'];
+				}
+			}
+		}
+		if ( $cart_fee_savings <= 0.005 ) {
+			return; // Nothing in the subtotal left to reconcile.
 		}
 		$this->total_after_rendered = true;
 
-		$incl_tax = WC()->cart->display_prices_including_tax();
-		$net      = (float) WC()->cart->get_subtotal() + $fee_total;
-		if ( $incl_tax ) {
-			$net += (float) WC()->cart->get_subtotal_tax() + (float) WC()->cart->get_fee_tax();
+		$subtotal = (float) WC()->cart->get_subtotal();
+		if ( WC()->cart->display_prices_including_tax() ) {
+			$subtotal += (float) WC()->cart->get_subtotal_tax();
 		}
+		$net = $subtotal - $cart_fee_savings;
 		if ( $net < 0 ) {
 			$net = 0.0;
 		}
