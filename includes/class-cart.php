@@ -69,6 +69,11 @@ class Cart {
 		// Reliable fallback: a row inside the cart-totals table (fires on nearly
 		// every classic theme, same place as the savings line).
 		add_action( 'woocommerce_cart_totals_before_order_total', array( $this, 'render_cart_messages_row' ), 5 );
+		// Checkout: the same nudges as a row inside the order-review table. This
+		// hook is the right one because it fires BOTH on the initial page render
+		// and inside every update_order_review AJAX refresh — a div outside the
+		// table would duplicate or vanish when WooCommerce re-renders the review.
+		add_action( 'woocommerce_review_order_before_order_total', array( $this, 'render_cart_messages_row' ), 5 );
 		// Universal manual placement for any theme/builder.
 		add_shortcode( 'promeng_cart_messages', array( $this, 'messages_shortcode' ) );
 

@@ -130,6 +130,10 @@ p.woocommerce-mini-cart__total{display:flex !important;align-items:center;justif
 .promeng-pop-amt{color:#16a34a;font-weight:600;white-space:nowrap;}
 
 /* Cart encouragement nudges */
+/* As a totals-table row (cart + checkout review): full width, no theme leader line. */
+.promeng-cart-messages-row td{padding:0 0 10px 0 !important;background:none !important;border:0 !important;}
+.promeng-cart-messages-row td:after,.promeng-cart-messages-row td:before{display:none !important;}
+.promeng-cart-messages-row .promeng-cart-messages{margin:0;}
 .promeng-cart-messages{
 	margin:0 0 18px;
 	display:flex;flex-direction:column;gap:8px;
