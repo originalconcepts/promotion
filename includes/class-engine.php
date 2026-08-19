@@ -215,8 +215,9 @@ class Engine {
 			}
 			$seen[ $msg ] = true;
 			$out[]        = array(
-				'text' => $msg,
-				'keys' => $this->types[ $promotion->type ]->related_keys( $promotion, $cart ),
+				'text'      => $msg,
+				'keys'      => $this->types[ $promotion->type ]->related_keys( $promotion, $cart ),
+				'promotion' => $promotion,
 			);
 		}
 		return $out;

@@ -447,27 +447,117 @@ class Cart {
 				$promotion = $info['promotion'];
 				$type      = $this->engine->get_type( $promotion->type );
 				$out[]     = array(
-					'text'    => sprintf(
+					'text'     => sprintf(
 						/* translators: 1: promotion name, 2: amount saved. */
 						__( '%1$s — you saved %2$s', 'promotion-engine' ),
 						$promotion->name ? $promotion->name : $info['label'],
 						html_entity_decode( wp_strip_all_tags( wc_price( (float) $info['saved'] ) ), ENT_QUOTES, 'UTF-8' )
 					),
-					'keys'    => $type ? array_map( 'strval', (array) $type->related_keys( $promotion, $lines ) ) : array(),
-					'applied' => true,
+					'name'     => $promotion->name ? $promotion->name : $info['label'],
+					'promo_id' => (int) $promotion->id,
+					'pool'     => $this->pool_kind( $promotion ),
+					'keys'     => $type ? array_map( 'strval', (array) $type->related_keys( $promotion, $lines ) ) : array(),
+					'applied'  => true,
 				);
 			}
 		}
 
 		foreach ( $this->engine->messages_detailed( $lines, $context ) as $row ) {
-			$out[] = array(
-				'text'    => (string) $row['text'],
-				'keys'    => array_map( 'strval', (array) $row['keys'] ),
-				'applied' => false,
+			$promotion = isset( $row['promotion'] ) ? $row['promotion'] : null;
+			$out[]     = array(
+				'text'     => (string) $row['text'],
+				'name'     => $promotion && $promotion->name ? $promotion->name : (string) $row['text'],
+				'promo_id' => $promotion ? (int) $promotion->id : 0,
+				'pool'     => $promotion ? $this->pool_kind( $promotion ) : 'none',
+				'keys'     => array_map( 'strval', (array) $row['keys'] ),
+				'applied'  => false,
 			);
 		}
 
 		return $out;
+	}
+
+	/**
+	 * What the promotion's target pool looks like: one specific product, a
+	 * group (several products / categories), or nothing enumerable.
+	 *
+	 * @return string single|group|none
+	 */
+	private function pool_kind( Promotion $promotion ) {
+		$ids  = $this->pool_product_ids( $promotion );
+		$cats = $this->pool_category_ids( $promotion );
+
+		if ( count( $ids ) === 1 && empty( $cats ) ) {
+			return 'single';
+		}
+		if ( ! empty( $ids ) || ! empty( $cats ) ) {
+			return 'group';
+		}
+		return 'none';
+	}
+
+	private function pool_product_ids( Promotion $promotion ) {
+		foreach ( array( 'buy_product_ids', 'product_ids' ) as $field ) {
+			$ids = array_filter( array_map( 'intval', (array) $promotion->get( $field, array() ) ) );
+			if ( $ids ) {
+				return array_values( $ids );
+			}
+		}
+		return array();
+	}
+
+	private function pool_category_ids( Promotion $promotion ) {
+		foreach ( array( 'buy_category_ids', 'category_ids' ) as $field ) {
+			$ids = array_filter( array_map( 'intval', (array) $promotion->get( $field, array() ) ) );
+			if ( $ids ) {
+				return array_values( $ids );
+			}
+		}
+		return array();
+	}
+
+	/**
+	 * The products participating in a promotion, for a "show me them" popup.
+	 *
+	 * @param int $promo_id Promotion id.
+	 * @param int $limit    Cap.
+	 * @return int[] product ids.
+	 */
+	public function promotion_products( $promo_id, $limit = 12 ) {
+		$promotion = \PromoEngine\Repository::get( (int) $promo_id );
+
+		if ( ! $promotion ) {
+			return array();
+		}
+
+		$ids = $this->pool_product_ids( $promotion );
+
+		if ( $ids ) {
+			return array_slice( $ids, 0, $limit );
+		}
+
+		$cats = $this->pool_category_ids( $promotion );
+
+		if ( ! $cats ) {
+			return array();
+		}
+
+		$slugs = array();
+		foreach ( $cats as $cat_id ) {
+			$slug = get_term_field( 'slug', $cat_id, 'product_cat' );
+			if ( ! is_wp_error( $slug ) ) {
+				$slugs[] = $slug;
+			}
+		}
+
+		return $slugs ? wc_get_products(
+			array(
+				'status'   => 'publish',
+				'limit'    => $limit,
+				'category' => $slugs,
+				'return'   => 'ids',
+			)
+		) : array();
 	}
 
 	/**
