@@ -185,10 +185,12 @@ class BuyXGetY implements Type {
 			$freed[ $key ] = isset( $freed[ $key ] ) ? $freed[ $key ] + 1 : 1;
 		}
 		$line_discounts = array();
+		$line_units     = array();
 		$saved          = 0.0;
 		foreach ( $freed as $key => $count ) {
 			$line_total_discount    = $per_unit[ $key ] * $count;
 			$line_discounts[ $key ] = $line_total_discount / $line_qty[ $key ];
+			$line_units[ $key ]     = $count;
 			$saved                 += $line_total_discount;
 		}
 
@@ -196,9 +198,10 @@ class BuyXGetY implements Type {
 			return $result;
 		}
 
-		$result['qualifies']      = true;
-		$result['line_discounts'] = $line_discounts;
-		$result['saved']          = round( $saved, wc_get_price_decimals() );
+		$result['qualifies']           = true;
+		$result['line_discounts']      = $line_discounts;
+		$result['line_discount_units'] = $line_units;
+		$result['saved']               = round( $saved, wc_get_price_decimals() );
 		return $result;
 	}
 

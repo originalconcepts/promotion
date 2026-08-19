@@ -59,10 +59,11 @@ class Engine {
 	 */
 	public function evaluate( array $cart, array $context = array() ) {
 		$out = array(
-			'line_discounts' => array(),
-			'cart_fees'      => array(),
-			'applied'        => array(),
-			'messages'       => array(),
+			'line_discounts'      => array(),
+			'line_discount_units' => array(),
+			'cart_fees'           => array(),
+			'applied'             => array(),
+			'messages'            => array(),
 		);
 
 		$context = wp_parse_args(
@@ -115,7 +116,16 @@ class Engine {
 			// cross-promotion stacking rules are a deliberate later decision).
 			foreach ( $result['line_discounts'] as $key => $per_unit ) {
 				$current = isset( $out['line_discounts'][ $key ] ) ? $out['line_discounts'][ $key ] : 0.0;
-				$out['line_discounts'][ $key ] = max( $current, $per_unit );
+				if ( $per_unit > $current ) {
+					$out['line_discounts'][ $key ] = $per_unit;
+					// The winner's partial-unit count travels with it; a
+					// uniform discount (no unit info) clears it.
+					if ( isset( $result['line_discount_units'][ $key ] ) ) {
+						$out['line_discount_units'][ $key ] = (int) $result['line_discount_units'][ $key ];
+					} else {
+						unset( $out['line_discount_units'][ $key ] );
+					}
+				}
 			}
 
 			if ( ! empty( $result['cart_discount'] ) ) {

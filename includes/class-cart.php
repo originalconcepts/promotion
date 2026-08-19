@@ -228,6 +228,12 @@ class Cart {
 				$base = (float) $cart->cart_contents[ $key ]['promeng_base_price'];
 				$new  = max( 0, $base - (float) $eval['line_discounts'][ $key ] );
 				$item['data']->set_price( $new );
+				// A partial benefit (1 of 2 units) blends into the line price;
+				// remember how many units really got it so displays can stay
+				// honest instead of showing an averaged "per unit sale".
+				$cart->cart_contents[ $key ]['promeng_disc_units'] = isset( $eval['line_discount_units'][ $key ] ) ? (int) $eval['line_discount_units'][ $key ] : null;
+			} else {
+				unset( $cart->cart_contents[ $key ]['promeng_disc_units'] );
 			}
 		}
 	}
@@ -275,6 +281,13 @@ class Cart {
 		$current = (float) $cart_item['data']->get_price();
 		if ( $current >= $base ) {
 			return $price_html;
+		}
+		// Only SOME units carry the benefit ("buy 1, second at 20%" on a
+		// quantity of 2): the blended average is not any unit's real price —
+		// show the plain base price and let the line total tell the story.
+		$units = isset( $cart_item['promeng_disc_units'] ) ? (int) $cart_item['promeng_disc_units'] : 0;
+		if ( $units > 0 && $units < (float) $cart_item['quantity'] ) {
+			return wp_kses_post( wc_price( $base ) );
 		}
 		return $this->before_after_html( $base, $current );
 	}
