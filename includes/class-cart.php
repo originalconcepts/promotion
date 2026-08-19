@@ -524,7 +524,7 @@ class Cart {
 	 * @return int[] product ids.
 	 */
 	public function promotion_products( $promo_id, $limit = 12 ) {
-		$promotion = \PromoEngine\Repository::get( (int) $promo_id );
+		$promotion = Repository::find( (int) $promo_id );
 
 		if ( ! $promotion ) {
 			return array();
