@@ -453,9 +453,11 @@ class Cart {
 						$promotion->name ? $promotion->name : $info['label'],
 						html_entity_decode( wp_strip_all_tags( wc_price( (float) $info['saved'] ) ), ENT_QUOTES, 'UTF-8' )
 					),
-					'name'     => $promotion->name ? $promotion->name : $info['label'],
-					'promo_id' => (int) $promotion->id,
-					'pool'     => $this->pool_kind( $promotion ),
+					'name'      => $promotion->name ? $promotion->name : $info['label'],
+					'promo_id'  => (int) $promotion->id,
+					'pool'      => $this->pool_kind( $promotion ),
+					'pool_type' => $this->pool( $promotion )['type'],
+					'cat_url'   => $this->pool_meta( $promotion->id )['category_url'],
 					'keys'     => $type ? array_map( 'strval', (array) $type->related_keys( $promotion, $lines ) ) : array(),
 					'applied'  => true,
 				);
@@ -466,9 +468,11 @@ class Cart {
 			$promotion = isset( $row['promotion'] ) ? $row['promotion'] : null;
 			$out[]     = array(
 				'text'     => (string) $row['text'],
-				'name'     => $promotion && $promotion->name ? $promotion->name : (string) $row['text'],
-				'promo_id' => $promotion ? (int) $promotion->id : 0,
-				'pool'     => $promotion ? $this->pool_kind( $promotion ) : 'none',
+				'name'      => $promotion && $promotion->name ? $promotion->name : (string) $row['text'],
+				'promo_id'  => $promotion ? (int) $promotion->id : 0,
+				'pool'      => $promotion ? $this->pool_kind( $promotion ) : 'none',
+				'pool_type' => $promotion ? $this->pool( $promotion )['type'] : 'none',
+				'cat_url'   => $promotion ? $this->pool_meta( $promotion->id )['category_url'] : '',
 				'keys'     => array_map( 'strval', (array) $row['keys'] ),
 				'applied'  => false,
 			);
@@ -484,36 +488,96 @@ class Cart {
 	 * @return string single|group|none
 	 */
 	private function pool_kind( Promotion $promotion ) {
-		$ids  = $this->pool_product_ids( $promotion );
-		$cats = $this->pool_category_ids( $promotion );
+		$pool = $this->pool( $promotion );
 
-		if ( count( $ids ) === 1 && empty( $cats ) ) {
+		if ( 'products' === $pool['type'] && 1 === count( $pool['products'] ) ) {
 			return 'single';
 		}
-		if ( ! empty( $ids ) || ! empty( $cats ) ) {
+		if ( 'none' !== $pool['type'] ) {
 			return 'group';
 		}
 		return 'none';
 	}
 
-	private function pool_product_ids( Promotion $promotion ) {
-		foreach ( array( 'buy_product_ids', 'product_ids' ) as $field ) {
-			$ids = array_filter( array_map( 'intval', (array) $promotion->get( $field, array() ) ) );
-			if ( $ids ) {
-				return array_values( $ids );
-			}
+	/**
+	 * The pool's shape and — for a category pool — the first category's url,
+	 * so a mini-cart can link "the participating products" straight there.
+	 *
+	 * @return array{type:string,category_url:string}
+	 */
+	public function pool_meta( $promo_id ) {
+		$promotion = Repository::find( (int) $promo_id );
+
+		if ( ! $promotion ) {
+			return array( 'type' => 'none', 'category_url' => '' );
 		}
-		return array();
+
+		$pool = $this->pool( $promotion );
+		$url  = '';
+
+		if ( 'categories' === $pool['type'] ) {
+			$link = get_term_link( (int) $pool['categories'][0], 'product_cat' );
+			$url  = is_wp_error( $link ) ? '' : (string) $link;
+		}
+
+		return array(
+			'type'         => $pool['type'],
+			'category_url' => $url,
+		);
+	}
+
+	/**
+	 * The promotion's target scope and its id fields — respecting the
+	 * promotion's OWN applies-to switch, so a stale field from a previous
+	 * configuration never leaks into the answer.
+	 *
+	 * @return array{type:string,products:array<int,int>,categories:array<int,int>}
+	 */
+	private function pool( Promotion $promotion ) {
+		if ( 'buy_x_get_y' === $promotion->type ) {
+			$applies  = (string) $promotion->get( 'buy_applies_to', 'all' );
+			$products = 'products' === $applies ? (array) $promotion->get( 'buy_product_ids', array() ) : array();
+			$cats     = 'categories' === $applies ? (array) $promotion->get( 'buy_category_ids', array() ) : array();
+		} elseif ( 'buy_x_pay_y' === $promotion->type ) {
+			$applies  = (string) $promotion->get( 'scope', 'product' );
+			$products = in_array( $applies, array( 'product', 'products' ), true ) ? (array) $promotion->get( 'product_ids', array() ) : array();
+			$cats     = in_array( $applies, array( 'category', 'categories' ), true ) ? (array) $promotion->get( 'category_ids', array() ) : array();
+		} else {
+			$applies  = (string) $promotion->get( 'applies_to', 'all' );
+			$products = 'products' === $applies ? (array) $promotion->get( 'product_ids', array() ) : array();
+			$cats     = 'categories' === $applies ? (array) $promotion->get( 'category_ids', array() ) : array();
+		}
+
+		$products = array_values( array_filter( array_map( 'intval', $products ) ) );
+		$cats     = array_values( array_filter( array_map( 'intval', $cats ) ) );
+
+		$type = 'none';
+		if ( $products ) {
+			$type = 'products';
+		} elseif ( $cats ) {
+			$type = 'categories';
+		}
+
+		return array(
+			'type'       => $type,
+			'products'   => $products,
+			'categories' => $cats,
+		);
+	}
+
+	private function pool_product_ids( Promotion $promotion ) {
+		return $this->pool( $promotion )['products'];
 	}
 
 	private function pool_category_ids( Promotion $promotion ) {
-		foreach ( array( 'buy_category_ids', 'category_ids' ) as $field ) {
-			$ids = array_filter( array_map( 'intval', (array) $promotion->get( $field, array() ) ) );
-			if ( $ids ) {
-				return array_values( $ids );
-			}
-		}
-		return array();
+		return $this->pool( $promotion )['categories'];
+	}
+
+	/**
+	 * A public read of the total-savings breakdown for outside panels.
+	 */
+	public function savings_summary() {
+		return $this->savings_data();
 	}
 
 	/**
