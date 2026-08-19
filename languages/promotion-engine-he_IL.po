@@ -375,16 +375,16 @@ msgid "Giorgio sync is not enabled."
 msgstr "סנכרון Giorgio אינו מופעל."
 
 msgid "Add %1$s more to get the deal: %2$s"
-msgstr "הוסיפו עוד %1$s כדי לקבל את המבצע: %2$s"
+msgstr "הוסיפו עוד %1$s כדי לקבל את המבצע %2$s"
 
 msgid "Add %1$s more for another deal: %2$s"
-msgstr "הוסיפו עוד %1$s כדי לקבל מבצע נוסף: %2$s"
+msgstr "הוסיפו עוד %1$s למבצע נוסף — %2$s"
 
 msgid "Add %1$s more to unlock: %2$s"
-msgstr "הוסיפו עוד %1$s כדי לפתוח: %2$s"
+msgstr "הוסיפו עוד %1$s כדי לקבל את %2$s"
 
 msgid "Add %1$s more to get: %2$s"
-msgstr "הוסיפו עוד %1$s כדי לקבל: %2$s"
+msgstr "הוסיפו עוד %1$s כדי לקבל את %2$s"
 
 msgid "You unlocked %s — add the offer item to your cart to claim it."
 msgstr "פתחתם את %s — הוסיפו את פריט ההטבה לסל כדי לממש."
@@ -403,8 +403,8 @@ msgstr "דרוש סכום הזמנה מינימלי"
 
 msgid "Add %1$d more item to unlock: %2$s"
 msgid_plural "Add %1$d more items to unlock: %2$s"
-msgstr[0] "הוסיפו עוד פריט %1$d כדי לפתוח: %2$s"
-msgstr[1] "הוסיפו עוד %1$d פריטים כדי לפתוח: %2$s"
+msgstr[0] "הוסיפו עוד פריט אחד כדי לקבל את %2$s"
+msgstr[1] "הוסיפו עוד %1$d פריטים כדי לקבל את %2$s"
 
 msgid "Add %1$d more item to get: %2$s"
 msgid_plural "Add %1$d more items to get: %2$s"

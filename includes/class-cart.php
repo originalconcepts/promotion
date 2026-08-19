@@ -33,7 +33,22 @@ class Cart {
 	/** @var bool Re-entrancy guard for auto-gift syncing. */
 	private $syncing_gifts = false;
 
+	/**
+	 * The registered instance, for outside callers (theme mini-carts).
+	 *
+	 * @var Cart|null
+	 */
+	private static $instance = null;
+
+	/**
+	 * @return Cart|null
+	 */
+	public static function instance() {
+		return self::$instance;
+	}
+
 	public function __construct( Engine $engine ) {
+		self::$instance = $this;
 		$this->engine = $engine;
 
 		add_action( 'woocommerce_before_calculate_totals', array( $this, 'apply_line_discounts' ), 20, 1 );
@@ -333,7 +348,7 @@ class Cart {
 
 		$icon = '<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false">'
 			. '<path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" '
-			. 'd="M20 12v8H4v-8M2 7h20v5H2zM12 22V7M12 7H8.5a2.5 2.5 0 1 1 0-5C11 2 12 7 12 7zM12 7h3.5a2.5 2.5 0 1 0 0-5C13 2 12 7 12 7z"/></svg>';
+			. 'd="M19 5L5 19M7.5 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM16.5 18a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/></svg>';
 
 		$check = '<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false">'
 			. '<path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.5l5 5L19.5 7"/></svg>';
@@ -403,6 +418,56 @@ class Cart {
 		}
 		$this->messages_rendered = true;
 		return $html;
+	}
+
+	/**
+	 * Structured messages for a mini-cart panel: applied promotions (name,
+	 * amount saved) and encouragement nudges — each with the cart line keys
+	 * it refers to, so the panel can pin it to the product's row.
+	 *
+	 * @return array<int,array{text:string,keys:array<int,string>,applied:bool}>
+	 */
+	public function panel_messages() {
+		if ( ! function_exists( 'WC' ) || ! WC()->cart || WC()->cart->is_empty() ) {
+			return array();
+		}
+
+		list( $lines, $context ) = $this->snapshot( WC()->cart );
+		$out                     = array();
+
+		$savings = $this->savings_data();
+		if ( null !== $savings ) {
+			if ( null === $this->last_eval ) {
+				$this->last_eval = $this->engine->evaluate( $lines, $context );
+			}
+			foreach ( $this->last_eval['applied'] as $info ) {
+				if ( (float) $info['saved'] <= 0 || $this->is_free_gift_promo( isset( $info['promotion'] ) ? $info['promotion'] : null ) ) {
+					continue;
+				}
+				$promotion = $info['promotion'];
+				$type      = $this->engine->get_type( $promotion->type );
+				$out[]     = array(
+					'text'    => sprintf(
+						/* translators: 1: promotion name, 2: amount saved. */
+						__( '%1$s — you saved %2$s', 'promotion-engine' ),
+						$promotion->name ? $promotion->name : $info['label'],
+						html_entity_decode( wp_strip_all_tags( wc_price( (float) $info['saved'] ) ), ENT_QUOTES, 'UTF-8' )
+					),
+					'keys'    => $type ? array_map( 'strval', (array) $type->related_keys( $promotion, $lines ) ) : array(),
+					'applied' => true,
+				);
+			}
+		}
+
+		foreach ( $this->engine->messages_detailed( $lines, $context ) as $row ) {
+			$out[] = array(
+				'text'    => (string) $row['text'],
+				'keys'    => array_map( 'strval', (array) $row['keys'] ),
+				'applied' => false,
+			);
+		}
+
+		return $out;
 	}
 
 	/**

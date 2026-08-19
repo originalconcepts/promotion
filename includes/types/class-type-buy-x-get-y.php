@@ -225,6 +225,18 @@ class BuyXGetY implements Type {
 		return false;
 	}
 
+	public function related_keys( Promotion $promotion, array $cart ) {
+		$buy_applies  = $promotion->get( 'buy_applies_to', 'all' );
+		$buy_excluded = array_map( 'intval', (array) $promotion->get( 'buy_excluded_product_ids', array() ) );
+		$keys         = array();
+		foreach ( $cart as $line ) {
+			if ( $this->buy_matches( $line, $promotion, $buy_applies, $buy_excluded ) ) {
+				$keys[] = (string) $line['key'];
+			}
+		}
+		return $keys;
+	}
+
 	public function encouragement( Promotion $promotion, array $cart, array $context ) {
 		$benefit_applies = $promotion->get( 'benefit_applies_to', 'products' );
 		$benefit_ids     = array_map( 'intval', (array) $promotion->get( 'benefit_product_ids', array() ) );

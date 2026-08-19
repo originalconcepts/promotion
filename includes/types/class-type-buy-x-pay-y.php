@@ -123,6 +123,18 @@ class BuyXPayY implements Type {
 		return $result;
 	}
 
+	public function related_keys( Promotion $promotion, array $cart ) {
+		$scope    = $promotion->get( 'scope', 'product' );
+		$excluded = array_map( 'intval', (array) $promotion->get( 'excluded_product_ids', array() ) );
+		$keys     = array();
+		foreach ( $cart as $line ) {
+			if ( $this->matches( $line, $promotion, $scope, $excluded ) ) {
+				$keys[] = (string) $line['key'];
+			}
+		}
+		return $keys;
+	}
+
 	public function encouragement( Promotion $promotion, array $cart, array $context ) {
 		$buy_qty = (float) $promotion->get( 'buy_quantity', 0 );
 		if ( $buy_qty <= 0 ) {

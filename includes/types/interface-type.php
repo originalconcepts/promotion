@@ -53,4 +53,13 @@ interface Type {
 	 * @return string
 	 */
 	public function encouragement( Promotion $promotion, array $cart, array $context );
+
+	/**
+	 * The cart line keys this promotion's messages refer to — the lines that
+	 * match its buy/target pool. Lets a mini-cart pin the message to the
+	 * product it talks about.
+	 *
+	 * @return string[]
+	 */
+	public function related_keys( Promotion $promotion, array $cart );
 }

@@ -179,6 +179,50 @@ class Engine {
 	}
 
 	/**
+	 * Like messages(), but each entry carries the cart line keys it refers
+	 * to — so a mini-cart can pin the nudge to the product it talks about.
+	 *
+	 * @return array<int,array{text:string,keys:array<int,string>}>
+	 */
+	public function messages_detailed( array $cart, array $context = array() ) {
+		$context = wp_parse_args(
+			$context,
+			array(
+				'subtotal'       => 0.0,
+				'customer_id'    => 0,
+				'customer_email' => '',
+			)
+		);
+
+		$out  = array();
+		$seen = array();
+		foreach ( Repository::active() as $promotion ) {
+			if ( ! isset( $this->types[ $promotion->type ] ) || ! $promotion->is_live() || ! $promotion->is_automatic() ) {
+				continue;
+			}
+			if ( ! App::promotion_runs_here( $promotion, isset( $context['channel'] ) ? $context['channel'] : null ) ) {
+				continue;
+			}
+			if ( ! $promotion->customer_type_allowed( ! empty( $context['is_logged_in'] ) ) ) {
+				continue;
+			}
+			if ( $promotion->limit_per_customer && Usage::customer_reached_limit( $promotion, $context['customer_id'], $context['customer_email'] ) ) {
+				continue;
+			}
+			$msg = $this->types[ $promotion->type ]->encouragement( $promotion, $cart, $context );
+			if ( ! is_string( $msg ) || '' === $msg || isset( $seen[ $msg ] ) ) {
+				continue;
+			}
+			$seen[ $msg ] = true;
+			$out[]        = array(
+				'text' => $msg,
+				'keys' => $this->types[ $promotion->type ]->related_keys( $promotion, $cart ),
+			);
+		}
+		return $out;
+	}
+
+	/**
 	 * Get a registered type handler (used by catalog label rendering).
 	 *
 	 * @return Type|null

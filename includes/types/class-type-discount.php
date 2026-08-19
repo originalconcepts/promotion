@@ -211,6 +211,21 @@ class Discount implements Type {
 	/**
 	 * Does a cart line match the promotion's targeting?
 	 */
+	public function related_keys( Promotion $promotion, array $cart ) {
+		$applies_to = $promotion->get( 'applies_to', 'all' );
+		$excluded   = array_map( 'intval', (array) $promotion->get( 'excluded_product_ids', array() ) );
+		$keys       = array();
+		if ( 'cart' === $applies_to ) {
+			return $keys; // a basket-level promo belongs to no single line.
+		}
+		foreach ( $cart as $line ) {
+			if ( $this->line_matches( $line, $promotion, $applies_to, $excluded ) ) {
+				$keys[] = (string) $line['key'];
+			}
+		}
+		return $keys;
+	}
+
 	public function encouragement( Promotion $promotion, array $cart, array $context ) {
 		if ( (float) $promotion->get( 'discount_value', 0 ) <= 0 ) {
 			return '';
