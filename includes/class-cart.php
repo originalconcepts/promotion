@@ -314,7 +314,9 @@ class Cart {
 	 * Encouragement nudges ("add X to unlock…") above the cart / checkout.
 	 */
 	/**
-	 * Build the encouragement-messages HTML, or '' when there's nothing to show.
+	 * Build the promotion-messages HTML, or '' when there's nothing to show:
+	 * first the promotions already APPLIED (name + amount saved, with a check
+	 * mark), then the encouragement nudges toward ones within reach.
 	 */
 	private function build_messages_html() {
 		if ( ! function_exists( 'WC' ) || ! WC()->cart || WC()->cart->is_empty() ) {
@@ -322,16 +324,34 @@ class Cart {
 		}
 		list( $lines, $context ) = $this->snapshot( WC()->cart );
 		$messages                = $this->engine->messages( $lines, $context );
-		if ( empty( $messages ) ) {
+		$messages                = array_slice( $messages, 0, 4 ); // keep it from getting noisy.
+		$savings                 = $this->savings_data();
+
+		if ( empty( $messages ) && null === $savings ) {
 			return '';
 		}
-		$messages = array_slice( $messages, 0, 4 ); // keep it from getting noisy.
 
 		$icon = '<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false">'
 			. '<path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" '
 			. 'd="M20 12v8H4v-8M2 7h20v5H2zM12 22V7M12 7H8.5a2.5 2.5 0 1 1 0-5C11 2 12 7 12 7zM12 7h3.5a2.5 2.5 0 1 0 0-5C13 2 12 7 12 7z"/></svg>';
 
+		$check = '<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" focusable="false">'
+			. '<path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.5l5 5L19.5 7"/></svg>';
+
 		$html = '<div class="promeng-cart-messages">';
+
+		if ( null !== $savings ) {
+			foreach ( $savings['items'] as $row ) {
+				$html .= '<div class="promeng-cart-message promeng-cart-message--applied"><span class="promeng-cart-message-icon">' . $check . '</span>'
+					. '<span class="promeng-cart-message-text">' . sprintf(
+						/* translators: 1: promotion name, 2: amount saved. */
+						esc_html__( '%1$s — you saved %2$s', 'promotion-engine' ),
+						esc_html( $row['name'] ),
+						wp_kses_post( wc_price( $row['saved'] ) )
+					) . '</span></div>';
+			}
+		}
+
 		foreach ( $messages as $m ) {
 			$html .= '<div class="promeng-cart-message"><span class="promeng-cart-message-icon">' . $icon . '</span>'
 				. '<span class="promeng-cart-message-text">' . esc_html( $m ) . '</span></div>';

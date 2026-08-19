@@ -846,3 +846,6 @@ msgstr "יח׳"
 
 msgid "Total after discount"
 msgstr "סה”כ אחרי הנחה"
+
+msgid "%1$s — you saved %2$s"
+msgstr "%1$s — חסכת %2$s"
