@@ -459,7 +459,15 @@ class Cart {
 				}
 				$promotion = $info['promotion'];
 				$type      = $this->engine->get_type( $promotion->type );
-				$out[]     = array(
+
+				// The applied message belongs to the lines the discount
+				// actually landed on — not the whole qualifying pool.
+				$keys = array_map( 'strval', (array) ( isset( $info['keys'] ) ? $info['keys'] : array() ) );
+				if ( ! $keys && $type ) {
+					$keys = array_map( 'strval', (array) $type->related_keys( $promotion, $lines ) );
+				}
+
+				$out[] = array(
 					'text'     => sprintf(
 						/* translators: 1: promotion name, 2: amount saved. */
 						__( '%1$s — you saved %2$s', 'promotion-engine' ),
@@ -471,23 +479,29 @@ class Cart {
 					'pool'      => $this->pool_kind( $promotion ),
 					'pool_type' => $this->pool( $promotion )['type'],
 					'cat_url'   => $this->pool_meta( $promotion->id )['category_url'],
-					'keys'     => $type ? array_map( 'strval', (array) $type->related_keys( $promotion, $lines ) ) : array(),
-					'applied'  => true,
+					'keys'      => $keys,
+					'applied'   => true,
 				);
 			}
 		}
 
+		// A nudge toward the NEXT set belongs to the lines still waiting for
+		// a benefit, not to the ones already carrying one.
+		$discounted_keys = null !== $this->last_eval ? array_map( 'strval', array_keys( (array) $this->last_eval['line_discounts'] ) ) : array();
+
 		foreach ( $this->engine->messages_detailed( $lines, $context ) as $row ) {
-			$promotion = isset( $row['promotion'] ) ? $row['promotion'] : null;
-			$out[]     = array(
-				'text'     => (string) $row['text'],
+			$promotion  = isset( $row['promotion'] ) ? $row['promotion'] : null;
+			$nudge_keys = array_map( 'strval', (array) $row['keys'] );
+			$waiting    = array_values( array_diff( $nudge_keys, $discounted_keys ) );
+			$out[]      = array(
+				'text'      => (string) $row['text'],
 				'name'      => $promotion && $promotion->name ? $promotion->name : (string) $row['text'],
 				'promo_id'  => $promotion ? (int) $promotion->id : 0,
 				'pool'      => $promotion ? $this->pool_kind( $promotion ) : 'none',
 				'pool_type' => $promotion ? $this->pool( $promotion )['type'] : 'none',
 				'cat_url'   => $promotion ? $this->pool_meta( $promotion->id )['category_url'] : '',
-				'keys'     => array_map( 'strval', (array) $row['keys'] ),
-				'applied'  => false,
+				'keys'      => $waiting ? $waiting : $nudge_keys,
+				'applied'   => false,
 			);
 		}
 
