@@ -148,7 +148,7 @@ class BuyXGetY implements Type {
 
 		// How many units are given for free / discounted.
 		$benefit_quantity = max( 1, (int) $promotion->get( 'benefit_quantity', 1 ) );
-		if ( 'products' === $benefit_applies ) {
+		if ( 'products' === $benefit_applies && ! $this->pools_overlap( $promotion, $cart ) ) {
 			// A distinct benefit product (a separate gift): each fulfillment earns
 			// benefit_quantity free units of it (amount- or item-count-driven).
 			$fulfillments = $this->fulfillments( $buy_qty, $buy_quantity, $min_amount, $threshold );
@@ -202,6 +202,29 @@ class BuyXGetY implements Type {
 		return $result;
 	}
 
+	/**
+	 * Does the benefit pool share units with the buy pool? A same-product
+	 * deal ("buy one, the second 20% off") must never count one unit both
+	 * as the qualifier and as the benefit.
+	 */
+	private function pools_overlap( Promotion $promotion, array $cart ) {
+		$buy_applies      = $promotion->get( 'buy_applies_to', 'all' );
+		$buy_excluded     = array_map( 'intval', (array) $promotion->get( 'buy_excluded_product_ids', array() ) );
+		$benefit_applies  = $promotion->get( 'benefit_applies_to', 'products' );
+		$benefit_ids      = array_map( 'intval', (array) $promotion->get( 'benefit_product_ids', array() ) );
+		$benefit_cats     = array_map( 'intval', (array) $promotion->get( 'benefit_category_ids', array() ) );
+		$benefit_excluded = array_map( 'intval', (array) $promotion->get( 'benefit_excluded_product_ids', array() ) );
+
+		foreach ( $cart as $line ) {
+			if ( $this->buy_matches( $line, $promotion, $buy_applies, $buy_excluded )
+				&& $this->benefit_matches( $line, $promotion, $benefit_applies, $benefit_ids, $benefit_cats, $benefit_excluded ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	public function encouragement( Promotion $promotion, array $cart, array $context ) {
 		$benefit_applies = $promotion->get( 'benefit_applies_to', 'products' );
 		$benefit_ids     = array_map( 'intval', (array) $promotion->get( 'benefit_product_ids', array() ) );
@@ -219,6 +242,13 @@ class BuyXGetY implements Type {
 		}
 
 		$buy_quantity = max( 1, (int) $promotion->get( 'buy_min_items', 1 ) );
+
+		// Overlapping pools: earning one benefit takes the buy units PLUS the
+		// benefit units — "buy 1, second 20% off" needs 2 in the cart before
+		// anything unlocks, and the nudge counts toward that.
+		if ( $this->pools_overlap( $promotion, $cart ) ) {
+			$buy_quantity += max( 1, (int) $promotion->get( 'benefit_quantity', 1 ) );
+		}
 		$min_amount   = (float) $promotion->get( 'buy_min_amount', 0 );
 		$threshold    = isset( $context['display_subtotal'] ) ? (float) $context['display_subtotal'] : ( isset( $context['subtotal'] ) ? (float) $context['subtotal'] : 0.0 );
 		$name         = $promotion->name ? $promotion->name : $this->label( $promotion );
