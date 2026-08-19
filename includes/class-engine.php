@@ -137,6 +137,7 @@ class Engine {
 
 			$out['applied'][ $promotion->id ] = array(
 				'promotion' => $promotion,
+				'keys'      => array_map( 'strval', array_keys( (array) $result['line_discounts'] ) ),
 				'saved'     => (float) $result['saved'],
 				'label'     => $result['label'],
 			);
