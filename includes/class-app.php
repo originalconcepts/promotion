@@ -83,6 +83,13 @@ class App {
 	 * @return bool
 	 */
 	public static function promotion_runs_here( Promotion $promotion, $channel = null ) {
+		// External kill-switch: integrations (OC B2B "no promotions for this
+		// group") can veto any promotion for the current visitor. This guard
+		// runs on every path — evaluate, messages, auto gifts, catalog, coupon.
+		if ( true !== apply_filters( 'promeng_promotion_allowed', true, $promotion ) ) {
+			return false;
+		}
+
 		// Interim measure: Giorgio does not yet send a per-promotion platform, so
 		// every Giorgio-authored promotion is stored as web-only and would be
 		// skipped inside the app. Until Giorgio can target platforms, run its
