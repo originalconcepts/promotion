@@ -3,7 +3,7 @@
  * Plugin Name:       Promotion Engine
  * Plugin URI:        https://giorgio.co.il
  * Description:        A self-contained promotions engine for WooCommerce (% / ₪ discount, Buy X Pay Y, Buy X Get Y). Works standalone, and can sync promotion definitions from Giorgio via API. Display name is a placeholder — rebrand via PROMENG_DISPLAY_NAME.
- * Version:           0.9.26
+ * Version:           0.9.27
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Original Concepts
@@ -34,7 +34,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // No direct access.
 }
 
-define( 'PROMENG_VERSION', '0.9.26' );
+define( 'PROMENG_VERSION', '0.9.27' );
 define( 'PROMENG_FILE', __FILE__ );
 define( 'PROMENG_DIR', plugin_dir_path( __FILE__ ) );
 define( 'PROMENG_URL', plugin_dir_url( __FILE__ ) );
@@ -58,6 +58,7 @@ require_once PROMENG_DIR . 'includes/class-engine.php';
 require_once PROMENG_DIR . 'includes/class-usage.php';
 require_once PROMENG_DIR . 'includes/class-cart.php';
 require_once PROMENG_DIR . 'includes/class-catalog.php';
+require_once PROMENG_DIR . 'includes/class-cache.php';
 require_once PROMENG_DIR . 'includes/class-coupon.php';
 require_once PROMENG_DIR . 'includes/class-influencer.php';
 require_once PROMENG_DIR . 'includes/class-settings.php';

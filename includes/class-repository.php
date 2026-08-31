@@ -86,12 +86,15 @@ class Repository {
 
 		if ( $id ) {
 			$wpdb->update( $table, $record, array( 'id' => $id ) );
+			do_action( 'promeng_promotion_changed', (int) $id, 'update' );
 			return (int) $id;
 		}
 
 		$record['created_at'] = $now;
 		$wpdb->insert( $table, $record );
-		return (int) $wpdb->insert_id;
+		$new_id = (int) $wpdb->insert_id;
+		do_action( 'promeng_promotion_changed', $new_id, 'create' );
+		return $new_id;
 	}
 
 	/**
@@ -108,6 +111,7 @@ class Repository {
 			),
 			array( 'id' => $id )
 		);
+		do_action( 'promeng_promotion_changed', (int) $id, $active ? 'activate' : 'deactivate' );
 	}
 
 	/**
@@ -157,6 +161,7 @@ class Repository {
 		global $wpdb;
 		$table = Installer::promotions_table();
 		$wpdb->delete( $table, array( 'id' => $id ) );
+		do_action( 'promeng_promotion_changed', (int) $id, 'delete' );
 	}
 
 	/**

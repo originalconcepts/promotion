@@ -40,6 +40,9 @@ class Plugin {
 		new Catalog();
 		new Coupon();
 
+		// Page-cache invalidation when a promotion changes.
+		( new Cache() )->hooks();
+
 		// Influencer Dashboard integration (only when that plugin is present).
 		if ( Influencer::is_active() ) {
 			( new Influencer() )->hooks();
