@@ -234,6 +234,53 @@ class Catalog {
 	}
 
 	/**
+	 * The price a shopper actually sees for one product, once an automatic,
+	 * unconditional catalog discount is taken off — or null when none is.
+	 *
+	 * Public because the price on a product page has to be the same number
+	 * wherever it is asked for: a product feed that advertises the price
+	 * before the discount is a price mismatch, and every network rejects
+	 * items for that. Anything outside this plugin should ask here rather
+	 * than reimplement the rules, which have three promotion types and a
+	 * pile of conditions behind them.
+	 *
+	 * A variation is priced on its own amount but targeted by its parent,
+	 * which is how the promotions themselves are written.
+	 *
+	 * @param \WC_Product $product Product or variation.
+	 * @return float|null
+	 */
+	public function catalog_price( $product ) {
+		if ( ! $product instanceof \WC_Product ) {
+			return null;
+		}
+
+		$base = (float) wc_get_price_to_display( $product );
+
+		if ( $base <= 0 ) {
+			return null;
+		}
+
+		$owner = $product->get_parent_id() ? (int) $product->get_parent_id() : (int) $product->get_id();
+		$spec  = $this->best_catalog_spec( $owner, $base );
+
+		if ( ! $spec ) {
+			return null;
+		}
+
+		$new = $this->apply_spec( $base, $spec );
+
+		/**
+		 * The discounted catalog price, for anything that needs the number.
+		 *
+		 * @param float|null  $new     Discounted price, or null.
+		 * @param \WC_Product $product The product.
+		 * @param float       $base    The price before the discount.
+		 */
+		return apply_filters( 'promeng_catalog_price', $new < $base ? $new : null, $product, $base );
+	}
+
+	/**
 	 * Before/after price html for simple/external and variable products.
 	 */
 	public function catalog_price_html( $html, $product ) {
@@ -244,15 +291,8 @@ class Catalog {
 
 		if ( 'simple' === $type || 'external' === $type ) {
 			$base = (float) wc_get_price_to_display( $product );
-			if ( $base <= 0 ) {
-				return $html;
-			}
-			$spec = $this->best_catalog_spec( $product->get_id(), $base );
-			if ( ! $spec ) {
-				return $html;
-			}
-			$new = $this->apply_spec( $base, $spec );
-			if ( $new >= $base ) {
+			$new  = $this->catalog_price( $product );
+			if ( null === $new ) {
 				return $html;
 			}
 			return $this->ba( wc_price( $base ), wc_price( $new ) );

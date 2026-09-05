@@ -19,6 +19,9 @@ class Plugin {
 	/** @var Engine */
 	public $engine;
 
+	/** @var Catalog the catalog display layer, which also answers price questions. */
+	public $catalog;
+
 	public static function instance() {
 		if ( null === self::$instance ) {
 			self::$instance = new self();
@@ -37,7 +40,7 @@ class Plugin {
 
 		// Front-end application.
 		new Cart( $this->engine );
-		new Catalog();
+		$this->catalog = new Catalog();
 		new Coupon();
 
 		// Page-cache invalidation when a promotion changes.
