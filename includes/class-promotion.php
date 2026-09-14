@@ -73,13 +73,34 @@ class Promotion {
 		$p->limit_per_customer = $row['limit_per_customer'] !== null ? (int) $row['limit_per_customer'] : null;
 		$p->starts_at         = $row['starts_at'] && $row['starts_at'] !== '0000-00-00 00:00:00' ? $row['starts_at'] : null;
 		$p->ends_at           = $row['ends_at'] && $row['ends_at'] !== '0000-00-00 00:00:00' ? $row['ends_at'] : null;
-		$p->weekdays          = array_filter( array_map( 'intval', explode( ',', (string) $row['weekdays'] ) ), 'is_numeric' );
+		$p->weekdays          = self::parse_weekdays( $row['weekdays'] );
 		$p->priority          = (int) $row['priority'];
 		$p->source            = (string) $row['source'];
 		$p->external_id       = $row['external_id'] !== null ? (string) $row['external_id'] : null;
 		$p->created_at        = ( ! empty( $row['created_at'] ) && 0 !== strpos( (string) $row['created_at'], '0000' ) ) ? (string) $row['created_at'] : null;
 		$p->updated_at        = ( ! empty( $row['updated_at'] ) && 0 !== strpos( (string) $row['updated_at'], '0000' ) ) ? (string) $row['updated_at'] : null;
 		return $p;
+	}
+
+	/**
+	 * Weekdays column to int[] 0 (Sunday) .. 6.
+	 *
+	 * An empty column means "no weekday restriction", which is how the admin screen and the Giorgio
+	 * sync store a promotion with no day ticked. explode() turns '' into [''] and intval() turns that
+	 * into [0], so the previous one-liner quietly made such a promotion live on Sundays only.
+	 *
+	 * @param string|null $csv Stored value, e.g. "0,1,2".
+	 * @return int[]
+	 */
+	private static function parse_weekdays( $csv ) {
+		$days = array();
+		foreach ( explode( ',', (string) $csv ) as $day ) {
+			$day = trim( $day );
+			if ( '' !== $day && ctype_digit( $day ) && (int) $day <= 6 ) {
+				$days[] = (int) $day;
+			}
+		}
+		return array_values( array_unique( $days ) );
 	}
 
 	/**
