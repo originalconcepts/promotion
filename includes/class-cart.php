@@ -861,6 +861,42 @@ class Cart {
 		// total = discounted (what the customer actually pays).
 		$item->set_subtotal( $base * $qty );
 		$item->set_total( $current * $qty );
+
+		// Attribute the line's discount to the promotion that produced it (hidden item meta), so the
+		// Giorgio payload can send lines[] per promotion on multi-promotion orders too. Without it Giorgio
+		// spread each promotion over every line of the order and overcharged non-promo lines at picking.
+		$owner = $this->line_discount_owner( $cart_item_key );
+		if ( $owner > 0 ) {
+			$item->add_meta_data(
+				'_promeng_promo_discounts',
+				array( $owner => round( ( $base - $current ) * $qty, wc_get_price_decimals() ) ),
+				true
+			);
+		}
+	}
+
+	/**
+	 * Promotion id whose per-unit discount won the largest-wins merge for a cart line (0 = none).
+	 * The engine stacks nothing per unit, so one promotion owns the whole line discount.
+	 */
+	private function line_discount_owner( $cart_item_key ) {
+		if ( null === $this->last_eval && function_exists( 'WC' ) && WC()->cart instanceof \WC_Cart ) {
+			list( $lines, $context ) = $this->snapshot( WC()->cart );
+			$this->last_eval         = $this->engine->evaluate( $lines, $context );
+		}
+		if ( null === $this->last_eval || empty( $this->last_eval['line_discounts'][ $cart_item_key ] ) ) {
+			return 0;
+		}
+		$winning = (float) $this->last_eval['line_discounts'][ $cart_item_key ];
+		foreach ( $this->last_eval['applied'] as $promotion_id => $info ) {
+			if ( ! isset( $info['line_discounts'][ $cart_item_key ] ) ) {
+				continue;
+			}
+			if ( abs( (float) $info['line_discounts'][ $cart_item_key ] - $winning ) < 0.000001 ) {
+				return (int) $promotion_id;
+			}
+		}
+		return 0;
 	}
 
 	/**

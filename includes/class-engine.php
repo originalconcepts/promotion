@@ -136,10 +136,13 @@ class Engine {
 			}
 
 			$out['applied'][ $promotion->id ] = array(
-				'promotion' => $promotion,
-				'keys'      => array_map( 'strval', array_keys( (array) $result['line_discounts'] ) ),
-				'saved'     => (float) $result['saved'],
-				'label'     => $result['label'],
+				'promotion'      => $promotion,
+				'keys'           => array_map( 'strval', array_keys( (array) $result['line_discounts'] ) ),
+				// This promotion's own per-unit line discounts (before the largest-wins merge above), so
+				// checkout can attribute each order line's discount to the promotion that produced it.
+				'line_discounts' => (array) $result['line_discounts'],
+				'saved'          => (float) $result['saved'],
+				'label'          => $result['label'],
 			);
 
 			if ( ! empty( $result['message'] ) ) {
