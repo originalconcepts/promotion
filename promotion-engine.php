@@ -3,7 +3,7 @@
  * Plugin Name:       Promotion Engine
  * Plugin URI:        https://giorgio.co.il
  * Description:        A self-contained promotions engine for WooCommerce (% / ₪ discount, Buy X Pay Y, Buy X Get Y). Works standalone, and can sync promotion definitions from Giorgio via API. Display name is a placeholder — rebrand via PROMENG_DISPLAY_NAME.
- * Version:           0.9.30
+ * Version:           0.10.0
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            Original Concepts
@@ -27,6 +27,14 @@
  * redemption events are reported back up so Giorgio's unified dashboard
  * reflects website activity. That sync layer lives in includes/giorgio/ and
  * is built in a later phase — the seams are already in place here.
+ *
+ * Sold as "OC Promotions" through OC Pluginz (my.ocpluginz.com): a licence
+ * key connected on the settings screen (tab "OC Pluginz account") registers
+ * the site with the hub and switches updates from GitHub to the hub's package
+ * store (includes/hub/). Giorgio client sites have no key and keep updating
+ * from GitHub as before. The licence never switches promotions off.
+ * wp-config.php constants: PROMENG_LICENSE_KEY (fixed key), OC_PLUGINZ_AGENCY
+ * (true = our own sites, no hub at all), PROMENG_HUB_URL (another hub).
  * --------------------------------------------------------------------------
  */
 
@@ -34,7 +42,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // No direct access.
 }
 
-define( 'PROMENG_VERSION', '0.9.30' );
+define( 'PROMENG_VERSION', '0.10.0' );
 define( 'PROMENG_FILE', __FILE__ );
 define( 'PROMENG_DIR', plugin_dir_path( __FILE__ ) );
 define( 'PROMENG_URL', plugin_dir_url( __FILE__ ) );
@@ -46,6 +54,8 @@ if ( ! defined( 'PROMENG_DISPLAY_NAME' ) ) {
 }
 
 // --- Includes -------------------------------------------------------------
+require_once PROMENG_DIR . 'includes/hub/class-hub.php';
+require_once PROMENG_DIR . 'includes/hub/class-hub-updater.php';
 require_once PROMENG_DIR . 'includes/class-updater.php';
 require_once PROMENG_DIR . 'includes/class-installer.php';
 require_once PROMENG_DIR . 'includes/class-promotion.php';
@@ -72,6 +82,7 @@ require_once PROMENG_DIR . 'includes/class-plugin.php';
 // --- Lifecycle ------------------------------------------------------------
 // Self-updates from GitHub (originalconcepts/promotion, branch main). Runs
 // everywhere, including wp-cron, so pushed updates install automatically.
+// Silent while an OC Pluginz licence is connected (see includes/hub/).
 \PromoEngine\Updater::instance();
 
 register_activation_hook( __FILE__, array( 'PromoEngine\\Installer', 'activate' ) );

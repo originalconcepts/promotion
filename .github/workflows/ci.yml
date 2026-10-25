@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    # Every branch, not only main: this repository's only PHP runtime is this
+    # workflow, so a feature branch is exactly where the lint is worth having.
+    branches: [ '**' ]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [ '7.4', '8.0', '8.1', '8.2', '8.3' ]
+    name: PHP ${{ matrix.php }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          tools: none
+
+      - name: Lint all PHP files
+        run: |
+          find . -path ./vendor -prune -o -name '*.php' -print0 \
+            | xargs -0 -n1 -P4 php -l
+
+  package:
+    runs-on: ubuntu-latest
+    name: Release zip
+    needs: lint
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # The same zip the hub's package store serves: top folder
+      # promotion-engine/, main file promotion-engine.php.
+      - name: Build promotion-engine.zip
+        run: bash bin/build-zip.sh
+
+      - name: Upload the zip as a workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: promotion-engine
+          path: dist/promotion-engine.zip
+          if-no-files-found: error

@@ -849,3 +849,168 @@ msgstr "סה”כ אחרי הנחה"
 
 msgid "%1$s — you saved %2$s"
 msgstr "%1$s — חסכת %2$s"
+
+msgid "OC Pluginz answered with status %d."
+msgstr "OC Pluginz ענה בסטטוס %d."
+
+msgid "OC Pluginz answered without a licence."
+msgstr "OC Pluginz ענה בלי רישיון."
+
+msgid "OC Pluginz does not recognise this key for OC Promotions. Check it in your OC Pluginz account."
+msgstr "OC Pluginz לא מזהה את המפתח הזה עבור OC Promotions. בדקו אותו בחשבון OC Pluginz שלכם."
+
+msgid "This licence is not active. Renew it in your OC Pluginz account."
+msgstr "הרישיון הזה אינו פעיל. חדשו אותו בחשבון OC Pluginz שלכם."
+
+msgid "Every site this licence allows is already connected. Disconnect another site first (in its Promotions settings, or in your OC Pluginz account)."
+msgstr "כל האתרים שהרישיון מאפשר כבר מחוברים. נתקו קודם אתר אחר (בהגדרות המבצעים שלו, או בחשבון OC Pluginz שלכם)."
+
+msgid "OC Pluginz does not offer OC Promotions yet. Contact Original Concepts."
+msgstr "OC Pluginz עדיין לא מציע את OC Promotions. פנו ל-Original Concepts."
+
+msgid "OC Pluginz refused the request for now. Try again in a minute."
+msgstr "OC Pluginz דחה את הבקשה לעת עתה. נסו שוב בעוד דקה."
+
+msgid "That does not look like an OC Pluginz licence key (ocpz_…)."
+msgstr "זה לא נראה כמו מפתח רישיון של OC Pluginz (ocpz_…)."
+
+msgid "No licence key."
+msgstr "אין מפתח רישיון."
+
+msgid "OC Pluginz did not accept the OC Promotions licence key, so updates are off. Promotions keep working."
+msgstr "OC Pluginz לא קיבל את מפתח הרישיון של OC Promotions, ולכן העדכונים כבויים. המבצעים ממשיכים לעבוד."
+
+msgid "The OC Promotions licence is suspended, so updates are off. Promotions keep working."
+msgstr "רישיון OC Promotions מושהה, ולכן העדכונים כבויים. המבצעים ממשיכים לעבוד."
+
+msgid "The OC Promotions licence has expired, so updates are off. Promotions keep working; renew to get updates again."
+msgstr "רישיון OC Promotions הסתיים, ולכן העדכונים כבויים. המבצעים ממשיכים לעבוד; חדשו אותו כדי לקבל עדכונים שוב."
+
+msgid "The OC Promotions licence has expired and is on its grace days. Renew now to keep getting updates."
+msgstr "רישיון OC Promotions הסתיים ונמצא בימי החסד. חדשו עכשיו כדי להמשיך לקבל עדכונים."
+
+msgid "OC Pluginz account"
+msgstr "חשבון OC Pluginz"
+
+msgid "Check for updates"
+msgstr "בדיקת עדכונים"
+
+msgid "Promotions engine for WooCommerce, licensed through OC Pluginz. Updates arrive from your OC Pluginz account while the licence is active."
+msgstr "מנוע מבצעים ל-WooCommerce, ברישיון דרך OC Pluginz. העדכונים מגיעים מחשבון OC Pluginz שלכם כל עוד הרישיון בתוקף."
+
+msgid "General"
+msgstr "כללי"
+
+msgid "Connected. The licence is active on this site."
+msgstr "מחובר. הרישיון פעיל באתר הזה."
+
+msgid "Disconnected. The licence seat for this site was released."
+msgstr "האתר נותק. מקום האתר ברישיון שוחרר."
+
+msgid "Licence status refreshed."
+msgstr "סטטוס הרישיון רוענן."
+
+msgid "Checked for updates. If a new version is available it now appears on the Plugins screen."
+msgstr "בוצעה בדיקת עדכונים. אם קיימת גרסה חדשה היא מופיעה עכשיו במסך התוספים."
+
+msgid "The licence controls updates and registers this site with OC Pluginz. Promotions keep working without it."
+msgstr "הרישיון שולט בעדכונים ורושם את האתר הזה ב-OC Pluginz. המבצעים ממשיכים לעבוד גם בלעדיו."
+
+msgid "Agency mode"
+msgstr "מצב סוכנות"
+
+msgid "OC_PLUGINZ_AGENCY is set in wp-config.php: this site does not use an OC Pluginz licence; updates come from GitHub."
+msgstr "OC_PLUGINZ_AGENCY מוגדר ב-wp-config.php: האתר הזה לא משתמש ברישיון OC Pluginz; העדכונים מגיעים מ-GitHub."
+
+msgid "Connect to OC Pluginz"
+msgstr "חיבור ל-OC Pluginz"
+
+msgid "Not connected"
+msgstr "לא מחובר"
+
+msgid "Paste the licence key from your OC Pluginz account. It was sent by email with the purchase and is listed in your account."
+msgstr "הדביקו את מפתח הרישיון מחשבון OC Pluginz שלכם. הוא נשלח במייל עם הרכישה ומופיע בחשבון."
+
+msgid "Licence key"
+msgstr "מפתח רישיון"
+
+msgid "Connect"
+msgstr "חיבור"
+
+msgid "OC Pluginz licence"
+msgstr "רישיון OC Pluginz"
+
+msgid "Set by PROMENG_LICENSE_KEY in wp-config.php."
+msgstr "מוגדר על ידי PROMENG_LICENSE_KEY ב-wp-config.php."
+
+msgid "Valid"
+msgstr "בתוקף"
+
+msgid "Renewing soon"
+msgstr "מתחדש בקרוב"
+
+msgid "Grace days"
+msgstr "ימי חסד"
+
+msgid "Expired"
+msgstr "הסתיים"
+
+msgid "Suspended"
+msgstr "מושהה"
+
+msgid "Not confirmed yet"
+msgstr "עדיין לא אושר"
+
+msgid "until %s"
+msgstr "עד %s"
+
+msgid "no expiry"
+msgstr "ללא תאריך סיום"
+
+msgid "Plan"
+msgstr "תוכנית"
+
+msgid "Sites"
+msgstr "אתרים"
+
+msgid "this site"
+msgstr "האתר הזה"
+
+msgid "%1$d of %2$d sites in use."
+msgstr "%1$d מתוך %2$d אתרים בשימוש."
+
+msgid "Updates"
+msgstr "עדכונים"
+
+msgid "Installed: %s"
+msgstr "מותקן: %s"
+
+msgid "Latest at OC Pluginz: %s"
+msgstr "העדכני ב-OC Pluginz: %s"
+
+msgid "Update from the Plugins screen"
+msgstr "עדכון ממסך התוספים"
+
+msgid "New versions are offered on the Plugins screen while the licence is valid."
+msgstr "גרסאות חדשות מוצעות במסך התוספים כל עוד הרישיון בתוקף."
+
+msgid "Last check"
+msgstr "בדיקה אחרונה"
+
+msgid "The licence is re-checked every hour and whenever this tab opens."
+msgstr "הרישיון נבדק מחדש כל שעה ובכל פתיחה של הלשונית הזאת."
+
+msgid "Refresh"
+msgstr "רענון"
+
+msgid "Disconnect this site from the licence? Updates from OC Pluginz stop until a key is connected again. Promotions keep working."
+msgstr "לנתק את האתר הזה מהרישיון? העדכונים מ-OC Pluginz ייפסקו עד שיחובר מפתח שוב. המבצעים ממשיכים לעבוד."
+
+msgid "Disconnect this site"
+msgstr "ניתוק האתר"
+
+msgid "Open your OC Pluginz account"
+msgstr "לחשבון OC Pluginz שלכם"
+
+msgid "New licence?"
+msgstr "רישיון חדש?"

@@ -51,8 +51,13 @@ class Plugin {
 			( new Influencer() )->hooks();
 		}
 
-		// Store-wide settings (catalog label position, …).
+		// Store-wide settings (catalog label position, OC Pluginz account tab).
 		( new Settings() )->hooks();
+
+		// OC Pluginz hub: licence (hourly re-check, notices) and, once a key is
+		// connected, updates from the hub instead of GitHub.
+		Hub::boot();
+		HubUpdater::boot();
 
 		// Giorgio sync layer (inbound REST push, outbound usage reporting).
 		( new \PromoEngine\Giorgio\Settings() )->hooks();
