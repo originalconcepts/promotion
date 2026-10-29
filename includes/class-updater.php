@@ -7,6 +7,14 @@
  * with a bumped `Version:` header rolls out to every installed site.
  * Auto-updates are forced on for this plugin (see `auto_update_plugin`).
  *
+ * This is the update path for Giorgio client sites, which have no OC Pluginz
+ * licence. When a licence key IS connected and the hub has answered for it
+ * (PromoEngine\Hub::connected()), PromoEngine\HubUpdater takes over: every
+ * filter below returns early, nothing is injected into the update transient,
+ * auto-updates are no longer forced and the "View details" window belongs to
+ * the hub. Disconnecting the licence hands updates straight back to GitHub.
+ * Agency mode (OC_PLUGINZ_AGENCY) counts as "not connected": GitHub as before.
+ *
  * @package PromoEngine
  */
 
@@ -116,7 +124,7 @@ class Updater {
 	 * @return object
 	 */
 	public function inject_update( $transient ) {
-		if ( ! is_object( $transient ) ) {
+		if ( ! is_object( $transient ) || Hub::connected() ) {
 			return $transient;
 		}
 
@@ -159,7 +167,7 @@ class Updater {
 	 * @return false|object
 	 */
 	public function plugin_info( $result, $action, $args ) {
-		if ( 'plugin_information' !== $action || empty( $args->slug ) || 'promotion-engine' !== $args->slug ) {
+		if ( 'plugin_information' !== $action || empty( $args->slug ) || 'promotion-engine' !== $args->slug || Hub::connected() ) {
 			return $result;
 		}
 
@@ -191,8 +199,8 @@ class Updater {
 	 * @return string|\WP_Error
 	 */
 	public function fix_source_folder( $source, $remote_source, $upgrader, $hook_extra ) {
-		if ( empty( $hook_extra['plugin'] ) || PROMENG_BASENAME !== $hook_extra['plugin'] ) {
-			return $source;
+		if ( empty( $hook_extra['plugin'] ) || PROMENG_BASENAME !== $hook_extra['plugin'] || Hub::connected() ) {
+			return $source; // The hub's zip already has promotion-engine/ as its top folder.
 		}
 
 		global $wp_filesystem;
@@ -217,7 +225,7 @@ class Updater {
 	 * @return bool|null
 	 */
 	public function force_auto_update( $update, $item ) {
-		if ( isset( $item->plugin ) && PROMENG_BASENAME === $item->plugin ) {
+		if ( isset( $item->plugin ) && PROMENG_BASENAME === $item->plugin && ! Hub::connected() ) {
 			return true;
 		}
 		return $update;
