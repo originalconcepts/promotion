@@ -187,7 +187,7 @@ class HubUpdater {
 			'name'          => PROMENG_DISPLAY_NAME,
 			'slug'          => self::slug(),
 			'version'       => $info['version'],
-			'author'        => '<a href="https://originalconcepts.co.il">Original Concepts</a>',
+			'author'        => '<a href="https://ocpluginz.com">OC Pluginz</a>',
 			'homepage'      => $info['url'],
 			'requires'      => $info['requires'],
 			'tested'        => $info['tested'],

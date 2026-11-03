@@ -177,7 +177,7 @@ class Updater {
 			'name'          => PROMENG_DISPLAY_NAME,
 			'slug'          => 'promotion-engine',
 			'version'       => $remote ? $remote : PROMENG_VERSION,
-			'author'        => 'Original Concepts',
+			'author'        => 'OC Pluginz',
 			'homepage'      => 'https://github.com/' . self::GITHUB_OWNER . '/' . self::GITHUB_REPO,
 			'requires'      => '6.0',
 			'requires_php'  => '7.4',
