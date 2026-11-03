@@ -54,9 +54,11 @@ class Plugin {
 		// Store-wide settings (catalog label position, OC Pluginz account tab).
 		( new Settings() )->hooks();
 
-		// OC Pluginz hub: licence (hourly re-check, notices) and, once a key is
-		// connected, updates from the hub instead of GitHub.
+		// OC Pluginz hub: licence (hourly re-check, notices), the hub's own notices
+		// for the admin, and, once a key is connected, updates from the hub instead
+		// of GitHub.
 		Hub::boot();
+		Notices::boot();
 		HubUpdater::boot();
 
 		// Giorgio sync layer (inbound REST push, outbound usage reporting).
