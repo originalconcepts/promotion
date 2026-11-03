@@ -4,9 +4,10 @@
  * from the hub and lists this install among the hub's sites.
  *
  * One option (promeng_hub) holds the key and a copy of the entitlement the hub
- * last answered with. The hub is asked again hourly (WP-Cron) and when the
- * account tab opens; an unreachable hub is survived on the cached copy, a hub
- * that refuses the key is not.
+ * last answered with, plus the hub's notices for the admin (class-notices.php).
+ * The hub is asked again hourly (WP-Cron) and when the account tab opens; an
+ * unreachable hub is survived on the cached copy, a hub that refuses the key
+ * is not.
  *
  * The licence never switches promotions off: discounts, coupons and the
  * Giorgio sync work with or without it. It decides two things only — whether
@@ -318,6 +319,7 @@ class Hub {
 		self::patch(
 			array(
 				'entitlement' => $ent,
+				'notices'     => Notices::from_answer( $data ),
 				'latest'      => isset( $data['latest'] ) ? (string) $data['latest'] : ( isset( $s['latest'] ) ? (string) $s['latest'] : '' ),
 				'checked_at'  => time(),
 				'error'       => '',
