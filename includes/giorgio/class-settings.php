@@ -10,6 +10,10 @@
  *   - webhook_secret : shared secret Giorgio sends back to the plugin
  *                      (inbound: pushing promotion definitions). Auto-generated.
  *
+ * The screen is a hidden page of the plugin under the suite's shared "OC Pluginz"
+ * menu (a "Giorgio Sync" tab in the strip above the Promotions screens; registered
+ * by \PromoEngine\Admin::register_with_suite()).
+ *
  * @package PromoEngine
  */
 
@@ -23,8 +27,10 @@ class Settings {
 
 	const OPTION = 'promeng_giorgio';
 
+	/** The page slug: admin.php?page=promeng-giorgio. */
+	const PAGE = 'promeng-giorgio';
+
 	public function hooks() {
-		add_action( 'admin_menu', array( $this, 'menu' ), 20 );
 		add_action( 'admin_post_promeng_giorgio_save', array( $this, 'handle_save' ) );
 	}
 
@@ -61,17 +67,6 @@ class Settings {
 		return ! empty( $s['enabled'] ) && ! empty( $s['base_url'] ) && ! empty( $s['api_key'] );
 	}
 
-	public function menu() {
-		add_submenu_page(
-			'promotion-engine',
-			__( 'Giorgio Sync', 'promotion-engine' ),
-			__( 'Giorgio Sync', 'promotion-engine' ),
-			'manage_woocommerce',
-			'promeng-giorgio',
-			array( $this, 'render' )
-		);
-	}
-
 	public function handle_save() {
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
 			wp_die( esc_html__( 'Not allowed.', 'promotion-engine' ) );
@@ -89,7 +84,7 @@ class Settings {
 		);
 		update_option( self::OPTION, $data, false );
 
-		wp_safe_redirect( add_query_arg( array( 'page' => 'promeng-giorgio', 'updated' => 1 ), admin_url( 'admin.php' ) ) );
+		wp_safe_redirect( add_query_arg( array( 'page' => self::PAGE, 'updated' => 1 ), admin_url( 'admin.php' ) ) );
 		exit;
 	}
 

@@ -16,8 +16,8 @@ defined in Giorgio is pushed to the store, stored with `source = "giorgio"`
 (read‑only in wp‑admin), and run by the engine. Redemptions flow back to
 Giorgio for the unified dashboard.
 
-All values the merchant needs are on the store's **Promotions → Giorgio Sync**
-screen: the API base URL + API key (for outbound), and the Webhook URL +
+All values the merchant needs are on the store's **OC Pluginz → Promotions → Giorgio Sync** (a tab above the Promotions
+screen): the API base URL + API key (for outbound), and the Webhook URL +
 Webhook secret (for inbound).
 
 ---

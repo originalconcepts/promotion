@@ -52,7 +52,8 @@ class Plugin {
 		}
 
 		// Store-wide settings (catalog label position, OC Pluginz account tab).
-		( new Settings() )->hooks();
+		$settings = new Settings();
+		$settings->hooks();
 
 		// OC Pluginz hub: licence (hourly re-check, notices), the hub's own notices
 		// for the admin, and, once a key is connected, updates from the hub instead
@@ -62,13 +63,15 @@ class Plugin {
 		HubUpdater::boot();
 
 		// Giorgio sync layer (inbound REST push, outbound usage reporting).
-		( new \PromoEngine\Giorgio\Settings() )->hooks();
+		$giorgio = new \PromoEngine\Giorgio\Settings();
+		$giorgio->hooks();
 		( new \PromoEngine\Giorgio\Rest() )->hooks();
 		( new \PromoEngine\Giorgio\Client() )->hooks();
 
-		// Admin.
+		// Admin: the entry under the shared "OC Pluginz" menu, with the Settings and
+		// Giorgio Sync screens as its tabs.
 		if ( is_admin() ) {
-			new Admin();
+			new Admin( $settings, $giorgio );
 		}
 
 		add_action( 'wp_enqueue_scripts', array( $this, 'frontend_assets' ) );

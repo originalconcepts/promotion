@@ -1014,3 +1014,6 @@ msgstr "לחשבון OC Pluginz שלכם"
 
 msgid "New licence?"
 msgstr "רישיון חדש?"
+
+msgid "Promotions for WooCommerce: % / ₪ discounts, Buy X Pay Y and Buy X Get Y, with coupons and scheduling."
+msgstr "מבצעים ל-WooCommerce: הנחות ב-% / ₪, קנה X שלם Y וקנה X קבל Y, עם קופונים ותזמון."

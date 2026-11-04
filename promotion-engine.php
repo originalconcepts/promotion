@@ -3,7 +3,7 @@
  * Plugin Name:       Promotion Engine
  * Plugin URI:        https://giorgio.co.il
  * Description:        A self-contained promotions engine for WooCommerce (% / ₪ discount, Buy X Pay Y, Buy X Get Y). Works standalone, and can sync promotion definitions from Giorgio via API. Display name is a placeholder — rebrand via PROMENG_DISPLAY_NAME.
- * Version:           0.11.4
+ * Version:           0.11.5
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            OC Pluginz
@@ -43,7 +43,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // No direct access.
 }
 
-define( 'PROMENG_VERSION', '0.11.4' );
+// The suite's shared admin chrome (one "OC Pluginz" menu for every OC plugin on the site); the newest bundled copy wins.
+require_once __DIR__ . '/oc-pluginz/loader.php';
+
+define( 'PROMENG_VERSION', '0.11.5' );
 define( 'PROMENG_FILE', __FILE__ );
 define( 'PROMENG_DIR', plugin_dir_path( __FILE__ ) );
 define( 'PROMENG_URL', plugin_dir_url( __FILE__ ) );

@@ -1,10 +1,14 @@
 <?php
 /**
- * Admin: menu, list screen, edit screen, save handling, row actions.
+ * Admin: the plugin's entry under the suite's shared "OC Pluginz" menu, list
+ * screen, edit screen, save handling, row actions.
  *
- * UI is PHP-rendered following WordPress admin conventions (RTL-aware via the
- * site locale). When the plugin is connected to Giorgio, Giorgio-sourced
- * promotions are shown read-only — Giorgio is authoritative for those.
+ * The "Promotions" entry opens the list screen; Settings and Giorgio Sync are
+ * hidden pages shown as tabs in the strip the suite draws above every OC screen
+ * (oc-pluginz/). UI is PHP-rendered following WordPress admin conventions
+ * (RTL-aware via the site locale). When the plugin is connected to Giorgio,
+ * Giorgio-sourced promotions are shown read-only — Giorgio is authoritative
+ * for those.
  *
  * @package PromoEngine
  */
@@ -19,8 +23,17 @@ class Admin {
 
 	const PAGE = 'promotion-engine';
 
-	public function __construct() {
-		add_action( 'admin_menu', array( $this, 'menu' ) );
+	/** @var Settings the store-wide settings screen (General / OC Pluginz account). */
+	private $settings;
+
+	/** @var Giorgio\Settings the Giorgio connection screen. */
+	private $giorgio;
+
+	public function __construct( Settings $settings, Giorgio\Settings $giorgio ) {
+		$this->settings = $settings;
+		$this->giorgio  = $giorgio;
+
+		add_action( 'init', array( $this, 'register_with_suite' ), 20 ); // after the textdomain (init 10): the labels are translated
 		add_action( 'admin_post_promeng_save', array( $this, 'handle_save' ) );
 		add_action( 'admin_post_promeng_action', array( $this, 'handle_row_action' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'assets' ) );
@@ -28,20 +41,47 @@ class Admin {
 		add_filter( 'request', array( $this, 'filter_orders_request' ) );
 	}
 
-	public function menu() {
-		add_menu_page(
-			PROMENG_DISPLAY_NAME,
-			esc_html__( 'Promotions', 'promotion-engine' ),
-			'manage_woocommerce',
+	/**
+	 * The plugin in the suite's shared "OC Pluginz" menu (oc-pluginz/): its entry, its screens
+	 * (the list as the main page, Settings and Giorgio Sync as tabs) and its card on the overview.
+	 * Page slugs and capabilities are unchanged, so every admin.php?page=… URL keeps working.
+	 */
+	public function register_with_suite() {
+		oc_pluginz_register(
 			self::PAGE,
-			array( $this, 'render' ),
-			'dashicons-tag',
-			56
+			array(
+				'name'        => __( 'Promotions', 'promotion-engine' ),
+				'page'        => self::PAGE,
+				'page_title'  => __( 'Promotions', 'promotion-engine' ),
+				'capability'  => 'manage_woocommerce',
+				'callback'    => array( $this, 'render' ),
+				'description' => __( 'Promotions for WooCommerce: % / ₪ discounts, Buy X Pay Y and Buy X Get Y, with coupons and scheduling.', 'promotion-engine' ),
+				'version'     => PROMENG_VERSION,
+				'account_url' => Settings::url( 'account' ),
+				'pages'       => array(
+					array(
+						'slug'       => Settings::PAGE,
+						'title'      => __( 'Settings', 'promotion-engine' ),
+						'capability' => 'manage_woocommerce',
+						'callback'   => array( $this->settings, 'render' ),
+					),
+					array(
+						'slug'       => Giorgio\Settings::PAGE,
+						'title'      => __( 'Giorgio Sync', 'promotion-engine' ),
+						'capability' => 'manage_woocommerce',
+						'callback'   => array( $this->giorgio, 'render' ),
+					),
+				),
+			)
 		);
 	}
 
 	public function assets( $hook ) {
-		if ( false === strpos( (string) $hook, self::PAGE ) ) {
+		// The list / edit screens only (Settings and Giorgio Sync use core admin styles). The hook
+		// suffix comes from the suite's library; it is '' before admin_menu ran or for a user who
+		// cannot open the page.
+		$main = class_exists( 'OC_Pluginz', false ) ? \OC_Pluginz::hook( self::PAGE ) : '';
+		if ( '' === $main || $main !== (string) $hook ) {
 			return;
 		}
 		wp_enqueue_style( 'promeng-admin', PROMENG_URL . 'assets/admin.css', array(), PROMENG_VERSION );
