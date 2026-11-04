@@ -7,10 +7,13 @@
  * single option array so more global settings can join it later without new
  * options.
  *
- * The screen has two tabs: "General" (the settings above) and "OC Pluginz
- * account" (the licence: connect / refresh / disconnect, status, seats,
- * updates — see includes/hub/class-hub.php). The licence tab is informational
- * on a site that has no key: promotions never depend on it.
+ * The screen is a hidden page of the plugin under the suite's shared "OC Pluginz"
+ * menu (a "Settings" tab in the strip above the Promotions screens; registered
+ * by Admin::register_with_suite()). It has two tabs of its own: "General" (the
+ * settings above) and "OC Pluginz account" (the licence: connect / refresh /
+ * disconnect, status, seats, updates — see includes/hub/class-hub.php). The
+ * licence tab is informational on a site that has no key: promotions never
+ * depend on it.
  *
  * @package PromoEngine
  */
@@ -60,26 +63,14 @@ class Settings {
 	}
 
 	public function hooks() {
-		add_action( 'admin_menu', array( $this, 'menu' ), 15 );
 		add_action( 'admin_post_promeng_settings_save', array( $this, 'handle_save' ) );
 		add_action( 'admin_post_promeng_hub_connect', array( $this, 'handle_hub_action' ) );
 		add_action( 'admin_post_promeng_hub_refresh', array( $this, 'handle_hub_action' ) );
 		add_action( 'admin_post_promeng_hub_disconnect', array( $this, 'handle_hub_action' ) );
 	}
 
-	public function menu() {
-		add_submenu_page(
-			Admin::PAGE,
-			__( 'Settings', 'promotion-engine' ),
-			__( 'Settings', 'promotion-engine' ),
-			'manage_woocommerce',
-			self::PAGE,
-			array( $this, 'render' )
-		);
-	}
-
 	/**
-	 * The settings screen URL, optionally on a tab.
+	 * The settings screen URL (admin.php?page=promeng-settings), optionally on a tab.
 	 *
 	 * @param string $tab general|account.
 	 * @return string
