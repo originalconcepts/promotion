@@ -39,6 +39,8 @@ $chan_meta = array(
 	'kiosk' => array( 'icon' => 'dashicons-desktop', 'label' => __( 'Kiosk', 'promotion-engine' ) ),
 );
 $app_on = App::is_active();
+// Restricted mode: every promotion that would be live is tagged — it is kept, just not applied.
+$licensed = Hub::licensed();
 
 $scope_label = function ( $p ) {
 	$names = function ( $ids, $is_term ) {
@@ -261,7 +263,12 @@ $ranges = array(
 						</td>
 						<?php endif; ?>
 						<td class="promeng-scope"><?php echo esc_html( $scope_label( $p ) ); ?></td>
-						<td><span class="promeng-validity v-<?php echo esc_attr( $vclass ); ?>"><?php echo esc_html( $vtext ); ?></span></td>
+						<td>
+							<span class="promeng-validity v-<?php echo esc_attr( $vclass ); ?>"><?php echo esc_html( $vtext ); ?></span>
+							<?php if ( ! $licensed && 'active' === $row['cat'] ) : ?>
+								<span class="promeng-validity v-licence" title="<?php esc_attr_e( 'The promotion is kept but not applied on the storefront: the site runs in restricted mode until the licence is back.', 'promotion-engine' ); ?>"><?php esc_html_e( 'Not applied — licence', 'promotion-engine' ); ?></span>
+							<?php endif; ?>
+						</td>
 						<td class="promeng-num">
 							<?php if ( $stats['redemptions'] > 0 ) : ?>
 								<a href="<?php echo esc_url( $this->orders_url( $p->id ) ); ?>"><?php echo esc_html( number_format_i18n( $stats['redemptions'] ) ); ?></a>

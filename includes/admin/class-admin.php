@@ -58,6 +58,7 @@ class Admin {
 				'description' => __( 'Promotions for WooCommerce: % / ₪ discounts, Buy X Pay Y and Buy X Get Y, with coupons and scheduling.', 'promotion-engine' ),
 				'version'     => PROMENG_VERSION,
 				'account_url' => Settings::url( 'account' ),
+				'status'      => array( Hub::class, 'card_status' ),
 				'pages'       => array(
 					array(
 						'slug'       => Settings::PAGE,

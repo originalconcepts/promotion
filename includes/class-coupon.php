@@ -37,8 +37,8 @@ class Coupon {
 	 */
 	private function find_by_code( $code ) {
 		$code = strtolower( trim( (string) $code ) );
-		if ( '' === $code ) {
-			return null;
+		if ( '' === $code || ! Hub::licensed() ) {
+			return null; // restricted mode: the plugin's coupon codes do not exist.
 		}
 		foreach ( Repository::active() as $p ) {
 			if ( ! $p->requires_coupon || ! $p->coupon_code ) {

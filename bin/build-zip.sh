@@ -20,7 +20,7 @@ mkdir -p "$stage/$slug" "$root/dist"
 # Everything the plugin needs at runtime; nothing that only the repository needs.
 rsync -a "$root/" "$stage/$slug/" \
   --exclude '.git' --exclude '.github' --exclude 'bin' --exclude 'dist' \
-  --exclude 'docs' --exclude '.gitignore' --exclude '*.zip' --exclude '*.bak' \
+  --exclude 'docs' --exclude 'tests' --exclude '.gitignore' --exclude '*.zip' --exclude '*.bak' \
   --exclude '.DS_Store' --exclude 'Thumbs.db' --exclude 'node_modules'
 
 rm -f "$out"
