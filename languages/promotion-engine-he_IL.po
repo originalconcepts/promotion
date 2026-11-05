@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: Promotion Engine 0.9.7\n"
+"Project-Id-Version: Promotion Engine 0.12.0\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -877,18 +877,6 @@ msgstr "זה לא נראה כמו מפתח רישיון של OC Pluginz (ocpz_�
 msgid "No licence key."
 msgstr "אין מפתח רישיון."
 
-msgid "OC Pluginz did not accept the OC Promotions licence key, so updates are off. Promotions keep working."
-msgstr "OC Pluginz לא קיבל את מפתח הרישיון של OC Promotions, ולכן העדכונים כבויים. המבצעים ממשיכים לעבוד."
-
-msgid "The OC Promotions licence is suspended, so updates are off. Promotions keep working."
-msgstr "רישיון OC Promotions מושהה, ולכן העדכונים כבויים. המבצעים ממשיכים לעבוד."
-
-msgid "The OC Promotions licence has expired, so updates are off. Promotions keep working; renew to get updates again."
-msgstr "רישיון OC Promotions הסתיים, ולכן העדכונים כבויים. המבצעים ממשיכים לעבוד; חדשו אותו כדי לקבל עדכונים שוב."
-
-msgid "The OC Promotions licence has expired and is on its grace days. Renew now to keep getting updates."
-msgstr "רישיון OC Promotions הסתיים ונמצא בימי החסד. חדשו עכשיו כדי להמשיך לקבל עדכונים."
-
 msgid "OC Pluginz account"
 msgstr "חשבון OC Pluginz"
 
@@ -912,9 +900,6 @@ msgstr "סטטוס הרישיון רוענן."
 
 msgid "Checked for updates. If a new version is available it now appears on the Plugins screen."
 msgstr "בוצעה בדיקת עדכונים. אם קיימת גרסה חדשה היא מופיעה עכשיו במסך התוספים."
-
-msgid "The licence controls updates and registers this site with OC Pluginz. Promotions keep working without it."
-msgstr "הרישיון שולט בעדכונים ורושם את האתר הזה ב-OC Pluginz. המבצעים ממשיכים לעבוד גם בלעדיו."
 
 msgid "Agency mode"
 msgstr "מצב סוכנות"
@@ -1003,9 +988,6 @@ msgstr "הרישיון נבדק מחדש כל שעה ובכל פתיחה של ה
 msgid "Refresh"
 msgstr "רענון"
 
-msgid "Disconnect this site from the licence? Updates from OC Pluginz stop until a key is connected again. Promotions keep working."
-msgstr "לנתק את האתר הזה מהרישיון? העדכונים מ-OC Pluginz ייפסקו עד שיחובר מפתח שוב. המבצעים ממשיכים לעבוד."
-
 msgid "Disconnect this site"
 msgstr "ניתוק האתר"
 
@@ -1017,3 +999,111 @@ msgstr "רישיון חדש?"
 
 msgid "Promotions for WooCommerce: % / ₪ discounts, Buy X Pay Y and Buy X Get Y, with coupons and scheduling."
 msgstr "מבצעים ל-WooCommerce: הנחות ב-% / ₪, קנה X שלם Y וקנה X קבל Y, עם קופונים ותזמון."
+
+msgid "No OC Pluginz licence key is connected to this site, and it is not connected to Giorgio."
+msgstr "לאתר הזה לא מחובר מפתח רישיון של OC Pluginz, והוא לא מחובר ל‑Giorgio."
+
+msgid "OC Pluginz did not accept the licence key of this site."
+msgstr "OC Pluginz לא קיבל את מפתח הרישיון של האתר הזה."
+
+msgid "The OC Promotions licence is suspended."
+msgstr "רישיון OC Promotions מושהה."
+
+msgid "The OC Promotions licence has expired and its grace days are over."
+msgstr "רישיון OC Promotions הסתיים וימי החסד שלו נגמרו."
+
+msgid "The OC Promotions licence has expired and is on its grace days."
+msgstr "רישיון OC Promotions הסתיים ונמצא בימי החסד שלו."
+
+msgid "OC Pluginz has not confirmed the licence key of this site yet."
+msgstr "OC Pluginz עדיין לא אישר את מפתח הרישיון של האתר הזה."
+
+msgid "The OC Promotions licence is active."
+msgstr "רישיון OC Promotions פעיל."
+
+msgid "Connected to Giorgio — full mode, no key needed"
+msgstr "מחובר ל‑Giorgio — מצב מלא, אין צורך במפתח"
+
+msgid "Grace days: renew the licence to keep promotions running"
+msgstr "ימי חסד: חדשו את הרישיון כדי שהמבצעים ימשיכו לפעול"
+
+msgid "Licence active — full mode"
+msgstr "הרישיון פעיל — מצב מלא"
+
+msgid "Restricted mode — promotions are not applied"
+msgstr "מצב מוגבל — המבצעים לא מוחלים"
+
+msgid "OC Promotions on %s: promotions are no longer applied"
+msgstr "OC Promotions באתר %s: המבצעים הפסיקו לפעול"
+
+msgid "What this means: promotions are not applied in the cart and at checkout — customers see full prices, no savings lines, no coupon codes of the plugin, no promotion labels in the catalog."
+msgstr "מה זה אומר: המבצעים לא מוחלים בסל ובקופה — הלקוחות רואים מחירים מלאים, בלי שורות חיסכון, בלי קודי הקופון של התוסף ובלי תוויות מבצע בקטלוג."
+
+msgid "Nothing was deleted: every promotion, its statistics and the order history are kept, all admin screens are open, and the Giorgio sync keeps running. As soon as the licence is valid again everything resumes by itself."
+msgstr "שום דבר לא נמחק: כל המבצעים, הסטטיסטיקה והיסטוריית ההזמנות נשמרים, כל מסכי הניהול פתוחים, וסנכרון Giorgio ממשיך לפעול. ברגע שהרישיון תקף שוב הכול חוזר לפעול מעצמו."
+
+msgid "The licence tab on your site: %s"
+msgstr "לשונית הרישיון באתר: %s"
+
+msgid "Your OC Pluginz account: %s"
+msgstr "החשבון שלכם ב‑OC Pluginz: %s"
+
+msgid "This email is sent once, when promotions stop being applied."
+msgstr "המייל הזה נשלח פעם אחת, כשהמבצעים מפסיקים לפעול."
+
+msgid "OC Promotions: promotions are not being applied right now."
+msgstr "OC Promotions: המבצעים לא מוחלים כרגע."
+
+msgid "Customers see full prices until the licence is back; the promotions, their statistics and the Giorgio sync stay as they are."
+msgstr "הלקוחות רואים מחירים מלאים עד שהרישיון יחזור; המבצעים, הסטטיסטיקה וסנכרון Giorgio נשארים כמו שהם."
+
+msgid "Fix the licence"
+msgstr "לתיקון הרישיון"
+
+msgid "My OC Pluginz account"
+msgstr "החשבון שלי ב‑OC Pluginz"
+
+msgid "OC Pluginz has not confirmed the OC Promotions licence key yet, so updates are off. Promotions keep working."
+msgstr "OC Pluginz עדיין לא אישר את מפתח הרישיון של OC Promotions, ולכן העדכונים כבויים. המבצעים ממשיכים לפעול."
+
+msgid "The OC Promotions licence is past its end date. Once OC Pluginz confirms it, promotions stop being applied. Renew now."
+msgstr "רישיון OC Promotions עבר את תאריך הסיום שלו. ברגע ש‑OC Pluginz יאשר זאת, המבצעים יפסיקו לפעול. חדשו עכשיו."
+
+msgid "The OC Promotions licence has expired and is on its grace days. Renew now: in a week promotions stop being applied."
+msgstr "רישיון OC Promotions הסתיים ונמצא בימי החסד שלו. חדשו עכשיו: בעוד שבוע המבצעים יפסיקו לפעול."
+
+msgid "The licence decides whether promotions are applied on the storefront and whether updates are offered, and registers this site with OC Pluginz. A site connected to Giorgio needs no key."
+msgstr "הרישיון קובע אם המבצעים מוחלים בחנות ואם מוצעים עדכונים, ורושם את האתר הזה ב‑OC Pluginz. אתר שמחובר ל‑Giorgio לא צריך מפתח."
+
+msgid "Check now"
+msgstr "בדיקה עכשיו"
+
+msgid "Disconnect this site from the licence? Updates from OC Pluginz stop, and unless this site is connected to Giorgio, promotions stop being applied until a key is connected again."
+msgstr "לנתק את האתר מהרישיון? העדכונים מ‑OC Pluginz ייפסקו, ואם האתר לא מחובר ל‑Giorgio, המבצעים יפסיקו לפעול עד שיחובר מפתח מחדש."
+
+msgid "Mode:"
+msgstr "המצב:"
+
+msgid "Full — promotions are applied"
+msgstr "מלא — המבצעים מוחלים"
+
+msgid "Restricted — promotions are not applied"
+msgstr "מוגבל — המבצעים לא מוחלים"
+
+msgid "since %s"
+msgstr "מאז %s"
+
+msgid "Connected to Giorgio — no key needed"
+msgstr "מחובר ל‑Giorgio — אין צורך במפתח"
+
+msgid "Promotions are applied on this site through its Giorgio connection, whatever the state of an OC Pluginz key."
+msgstr "המבצעים מוחלים באתר הזה דרך החיבור ל‑Giorgio, ללא קשר למצב של מפתח OC Pluginz."
+
+msgid "Customers see full prices. Every promotion, its statistics and the settings are kept; connect a valid licence key (or Giorgio) and promotions apply again at once."
+msgstr "הלקוחות רואים מחירים מלאים. כל המבצעים, הסטטיסטיקה וההגדרות נשמרים; חברו מפתח רישיון תקף (או Giorgio) והמבצעים יחזרו לפעול מיד."
+
+msgid "The promotion is kept but not applied on the storefront: the site runs in restricted mode until the licence is back."
+msgstr "המבצע נשמר אבל לא מוחל בחנות: האתר פועל במצב מוגבל עד שהרישיון יחזור."
+
+msgid "Not applied — licence"
+msgstr "לא פעיל — רישיון"
