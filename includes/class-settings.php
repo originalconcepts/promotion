@@ -11,9 +11,9 @@
  * menu (a "Settings" tab in the strip above the Promotions screens; registered
  * by Admin::register_with_suite()). It has two tabs of its own: "General" (the
  * settings above) and "OC Pluginz account" (the licence: connect / refresh /
- * disconnect, status, seats, updates — see includes/hub/class-hub.php). The
- * licence tab is informational on a site that has no key: promotions never
- * depend on it.
+ * disconnect, status, seats, updates — see includes/hub/class-hub.php), with the
+ * site's mode (full / restricted) on top. A site connected to Giorgio needs no
+ * key and says so there.
  *
  * @package PromoEngine
  */
@@ -128,6 +128,7 @@ class Settings {
 
 			case 'promeng_hub_refresh':
 				$res = Hub::refresh();
+				Hub::evaluate();
 				if ( is_wp_error( $res ) ) {
 					wp_safe_redirect( add_query_arg( 'promeng_err', rawurlencode( $res->get_error_message() ), $back ) );
 					exit;
@@ -301,8 +302,10 @@ class Settings {
 				<div class="notice notice-error inline"><p><?php echo esc_html( $error ); ?></p></div>
 			<?php endif; ?>
 
+			<?php $this->render_mode_box(); ?>
+
 			<p class="description" style="max-width:680px">
-				<?php esc_html_e( 'The licence controls updates and registers this site with OC Pluginz. Promotions keep working without it.', 'promotion-engine' ); ?>
+				<?php esc_html_e( 'The licence decides whether promotions are applied on the storefront and whether updates are offered, and registers this site with OC Pluginz. A site connected to Giorgio needs no key.', 'promotion-engine' ); ?>
 			</p>
 
 			<?php if ( Hub::agency() ) : ?>
@@ -428,7 +431,7 @@ class Settings {
 						<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 							<?php wp_nonce_field( 'promeng_hub_refresh' ); ?>
 							<input type="hidden" name="action" value="promeng_hub_refresh">
-							<button class="button"><?php esc_html_e( 'Refresh', 'promotion-engine' ); ?></button>
+							<button class="button"><?php esc_html_e( 'Check now', 'promotion-engine' ); ?></button>
 						</form>
 						<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 							<?php wp_nonce_field( HubUpdater::ACTION ); ?>
@@ -436,7 +439,7 @@ class Settings {
 							<button class="button"><?php esc_html_e( 'Check for updates', 'promotion-engine' ); ?></button>
 						</form>
 						<?php if ( ! $constant ) : ?>
-							<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" onsubmit="return confirm('<?php echo esc_js( __( 'Disconnect this site from the licence? Updates from OC Pluginz stop until a key is connected again. Promotions keep working.', 'promotion-engine' ) ); ?>');">
+							<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" onsubmit="return confirm('<?php echo esc_js( __( 'Disconnect this site from the licence? Updates from OC Pluginz stop, and unless this site is connected to Giorgio, promotions stop being applied until a key is connected again.', 'promotion-engine' ) ); ?>');">
 								<?php wp_nonce_field( 'promeng_hub_disconnect' ); ?>
 								<input type="hidden" name="action" value="promeng_hub_disconnect">
 								<button class="button button-link-delete"><?php esc_html_e( 'Disconnect this site', 'promotion-engine' ); ?></button>
@@ -445,6 +448,40 @@ class Settings {
 					</div>
 					<?php $this->account_links(); ?>
 				</div>
+			<?php endif; ?>
+		</div>
+		<?php
+	}
+
+	/**
+	 * The site's mode on top of the tab: full or restricted, why, since when — and, for a Giorgio
+	 * site, that no key is needed.
+	 */
+	private function render_mode_box() {
+		if ( Hub::agency() ) {
+			return;
+		}
+		$licensed = Hub::licensed();
+		$record   = Hub::mode_record();
+		$since    = $record['since'] ? date_i18n( get_option( 'date_format' ), $record['since'] + (int) ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS ) ) : '';
+		$color    = $licensed ? '#15803d' : '#b32d2e';
+		?>
+		<div class="notice inline promeng-mode-box" style="border-left-color:<?php echo esc_attr( $color ); ?>;margin:0 0 16px;padding:12px 16px;">
+			<p style="margin:0 0 4px;">
+				<strong><?php esc_html_e( 'Mode:', 'promotion-engine' ); ?></strong>
+				<strong style="color:<?php echo esc_attr( $color ); ?>"><?php echo esc_html( $licensed ? __( 'Full — promotions are applied', 'promotion-engine' ) : __( 'Restricted — promotions are not applied', 'promotion-engine' ) ); ?></strong>
+				<?php if ( '' !== $since && $record['mode'] === ( $licensed ? Hub::FULL : Hub::RESTRICTED ) ) : ?>
+					<span class="description">· <?php /* translators: %s: date */ echo esc_html( sprintf( __( 'since %s', 'promotion-engine' ), $since ) ); ?></span>
+				<?php endif; ?>
+			</p>
+			<?php if ( Hub::giorgio() ) : ?>
+				<p style="margin:0;"><strong style="color:#15803d"><?php esc_html_e( 'Connected to Giorgio — no key needed', 'promotion-engine' ); ?></strong>
+					<span class="description"><?php esc_html_e( 'Promotions are applied on this site through its Giorgio connection, whatever the state of an OC Pluginz key.', 'promotion-engine' ); ?></span></p>
+			<?php elseif ( ! $licensed ) : ?>
+				<p style="margin:0;"><?php echo esc_html( Hub::reason_text( Hub::status() ) ); ?>
+					<span class="description"><?php esc_html_e( 'Customers see full prices. Every promotion, its statistics and the settings are kept; connect a valid licence key (or Giorgio) and promotions apply again at once.', 'promotion-engine' ); ?></span></p>
+			<?php elseif ( '' !== Hub::status() ) : ?>
+				<p style="margin:0;"><?php echo esc_html( Hub::reason_text( Hub::status() ) ); ?></p>
 			<?php endif; ?>
 		</div>
 		<?php

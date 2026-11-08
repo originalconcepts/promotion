@@ -3,7 +3,7 @@
  * Plugin Name:       Promotion Engine
  * Plugin URI:        https://giorgio.co.il
  * Description:        A self-contained promotions engine for WooCommerce (% / ₪ discount, Buy X Pay Y, Buy X Get Y). Works standalone, and can sync promotion definitions from Giorgio via API. Display name is a placeholder — rebrand via PROMENG_DISPLAY_NAME.
- * Version:           0.11.5
+ * Version:           0.12.0
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            OC Pluginz
@@ -33,9 +33,16 @@
  * key connected on the settings screen (tab "OC Pluginz account") registers
  * the site with the hub and switches updates from GitHub to the hub's package
  * store (includes/hub/). Giorgio client sites have no key and keep updating
- * from GitHub as before. The licence never switches promotions off.
+ * from GitHub as before.
+ *
+ * Restricted mode (0.12.0): without a valid licence — no key, a refused or
+ * suspended key, or an expiry the hub confirmed after the grace days — the
+ * plugin keeps every promotion, screen and sync but stops APPLYING promotions
+ * on the storefront (PromoEngine\Hub::licensed()). A site connected to Giorgio
+ * is licensed by that connection alone and needs no key. An unreachable hub
+ * never restricts anything.
  * wp-config.php constants: PROMENG_LICENSE_KEY (fixed key), OC_PLUGINZ_AGENCY
- * (true = our own sites, no hub at all), PROMENG_HUB_URL (another hub).
+ * (true = our own sites, no hub at all, always full), PROMENG_HUB_URL (another hub).
  * --------------------------------------------------------------------------
  */
 
@@ -46,7 +53,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 // The suite's shared admin chrome (one "OC Pluginz" menu for every OC plugin on the site); the newest bundled copy wins.
 require_once __DIR__ . '/oc-pluginz/loader.php';
 
-define( 'PROMENG_VERSION', '0.11.5' );
+define( 'PROMENG_VERSION', '0.12.0' );
 define( 'PROMENG_FILE', __FILE__ );
 define( 'PROMENG_DIR', plugin_dir_path( __FILE__ ) );
 define( 'PROMENG_URL', plugin_dir_url( __FILE__ ) );

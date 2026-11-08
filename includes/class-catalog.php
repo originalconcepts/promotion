@@ -61,6 +61,9 @@ class Catalog {
 			return $this->promos;
 		}
 		$this->promos = array();
+		if ( ! Hub::licensed() ) {
+			return $this->promos; // restricted mode: no labels, no sale prices in the catalog.
+		}
 		$logged_in    = is_user_logged_in();
 		foreach ( Repository::active() as $p ) {
 			if ( $p->is_live() && App::promotion_runs_here( $p ) && $p->customer_type_allowed( $logged_in ) ) {

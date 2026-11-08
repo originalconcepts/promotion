@@ -161,6 +161,7 @@
 .promeng-validity.v-urgent{background:#fee2e2;color:#dc2626;}
 .promeng-validity.v-scheduled{background:#dbeafe;color:#1d4ed8;}
 .promeng-validity.v-ended{background:#f3f4f6;color:#9ca3af;}
+.promeng-validity.v-licence{background:#fee2e2;color:#b91c1c;margin-top:4px;}
 
 /* Toggle switch (shared with list) */
 .promeng-toggle-switch{display:inline-block;width:42px;height:24px;border-radius:999px;background:#d1d5db;position:relative;transition:background .15s;text-decoration:none;}

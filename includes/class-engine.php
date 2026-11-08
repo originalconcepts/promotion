@@ -8,6 +8,12 @@
  * REST evaluate endpoint go through here, so there is one source of truth in
  * the plugin.
  *
+ * Restricted mode (Hub::licensed() false: no valid OC Pluginz licence and no
+ * Giorgio connection): every computation here answers "nothing applies", so
+ * the cart charges full prices, shows no savings or nudges and adds no gifts
+ * — and a gift line left over from an earlier session is removed, since it
+ * is no longer earned. The promotions themselves are untouched.
+ *
  * @package PromoEngine
  */
 
@@ -65,6 +71,10 @@ class Engine {
 			'applied'             => array(),
 			'messages'            => array(),
 		);
+
+		if ( ! Hub::licensed() ) {
+			return $out; // restricted mode: nothing is applied.
+		}
 
 		$context = wp_parse_args(
 			$context,
@@ -161,6 +171,9 @@ class Engine {
 	 * @return string[] de-duplicated messages.
 	 */
 	public function messages( array $cart, array $context = array() ) {
+		if ( ! Hub::licensed() ) {
+			return array();
+		}
 		$context = wp_parse_args(
 			$context,
 			array(
@@ -199,6 +212,9 @@ class Engine {
 	 * @return array<int,array{text:string,keys:array<int,string>}>
 	 */
 	public function messages_detailed( array $cart, array $context = array() ) {
+		if ( ! Hub::licensed() ) {
+			return array();
+		}
 		$context = wp_parse_args(
 			$context,
 			array(
@@ -255,6 +271,9 @@ class Engine {
 	 */
 	public function auto_gifts( array $cart, array $context = array() ) {
 		$out = array();
+		if ( ! Hub::licensed() ) {
+			return $out; // restricted mode: no gift is earned, so leftover gift lines get removed.
+		}
 		foreach ( Repository::active() as $promotion ) {
 			if ( 'buy_x_get_y' !== $promotion->type ) {
 				continue;

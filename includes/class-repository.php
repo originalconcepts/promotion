@@ -115,6 +115,20 @@ class Repository {
 	}
 
 	/**
+	 * Does the table hold any promotion Giorgio pushed? Such a row can only have arrived through the
+	 * authenticated sync, so it is evidence of a Giorgio connection (Hub::giorgio() keeps the answer
+	 * for the request).
+	 *
+	 * @return bool
+	 */
+	public static function has_giorgio() {
+		global $wpdb;
+		$table = Installer::promotions_table();
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		return (bool) $wpdb->get_var( "SELECT id FROM {$table} WHERE source = 'giorgio' LIMIT 1" );
+	}
+
+	/**
 	 * Find a promotion by its Giorgio external id.
 	 *
 	 * @return Promotion|null
