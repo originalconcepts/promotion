@@ -1023,8 +1023,9 @@ class Cart {
 	 * block_coupons) is discounting the cart: a site-wide sale should not
 	 * stack with the welcome code. WooCommerce asks this both when the code is
 	 * entered and when the cart is checked again, so a coupon applied before
-	 * the sale began is taken out with the same message. The codes of the
-	 * plugin's own coupon-required promotions are never refused here.
+	 * the sale began is taken out with the same message. That covers the
+	 * plugin's own coupon-required promotions too (a welcome code is a coupon
+	 * to the shopper); only the blocking promotion's own code passes.
 	 *
 	 * @param bool       $valid  Valid so far.
 	 * @param \WC_Coupon $coupon The coupon.
@@ -1038,19 +1039,13 @@ class Cart {
 
 		$code = strtolower( (string) $coupon->get_code() );
 
-		foreach ( Repository::active() as $own ) {
-			if ( $own->requires_coupon && strtolower( (string) $own->coupon_code ) === $code ) {
-				return $valid;
-			}
-		}
-
 		list( $lines, $context ) = $this->snapshot( WC()->cart );
 		$eval                    = $this->engine->evaluate( $lines, $context );
 
 		foreach ( (array) $eval['applied'] as $info ) {
 			$promotion = isset( $info['promotion'] ) ? $info['promotion'] : null;
 
-			if ( $promotion instanceof Promotion && $promotion->get( 'block_coupons', false ) ) {
+			if ( $promotion instanceof Promotion && $promotion->get( 'block_coupons', false ) && strtolower( (string) $promotion->coupon_code ) !== $code ) {
 				throw new \Exception(
 					sprintf(
 						/* translators: %s: promotion name. */

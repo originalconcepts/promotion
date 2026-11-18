@@ -1111,8 +1111,8 @@ msgstr "לא פעיל — רישיון"
 msgid "No coupons while this promotion applies"
 msgstr "בלי קופונים כשהמבצע חל"
 
-msgid "A store coupon entered while this promotion discounts the cart is refused, and one already in the cart is taken out. The promotion's own code above still works."
-msgstr "קופון של החנות שמוזן בזמן שהמבצע הזה מוריד מחיר בעגלה יידחה, וקופון שכבר נמצא בעגלה יוסר. קוד הקופון של המבצע עצמו (למעלה) ימשיך לעבוד."
+msgid "Any coupon entered while this promotion discounts the cart is refused, a welcome code from another promotion included, and one already in the cart is taken out. This promotion's own code above still works."
+msgstr "כל קופון שמוזן בזמן שהמבצע הזה מוריד מחיר בעגלה יידחה, כולל קוד הטבה של מבצע אחר (למשל קוד הצטרפות), וקופון שכבר נמצא בעגלה יוסר. קוד הקופון של המבצע הזה עצמו (למעלה) ימשיך לעבוד."
 
 #. translators: %s: promotion name.
 msgid "%s cannot be combined with coupons."

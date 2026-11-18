@@ -145,7 +145,7 @@ $product_options = function ( $ids ) {
 				</span>
 				<span><?php esc_html_e( 'No coupons while this promotion applies', 'promotion-engine' ); ?></span>
 			</label>
-			<p class="description"><?php esc_html_e( 'A store coupon entered while this promotion discounts the cart is refused, and one already in the cart is taken out. The promotion\'s own code above still works.', 'promotion-engine' ); ?></p>
+			<p class="description"><?php esc_html_e( 'Any coupon entered while this promotion discounts the cart is refused, a welcome code from another promotion included, and one already in the cart is taken out. This promotion\'s own code above still works.', 'promotion-engine' ); ?></p>
 
 			<?php if ( \PromoEngine\Influencer::is_active() ) : ?>
 				<?php
