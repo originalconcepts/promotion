@@ -1107,3 +1107,13 @@ msgstr "המבצע נשמר אבל לא מוחל בחנות: האתר פועל �
 
 msgid "Not applied — licence"
 msgstr "לא פעיל — רישיון"
+
+msgid "No coupons while this promotion applies"
+msgstr "בלי קופונים כשהמבצע חל"
+
+msgid "A store coupon entered while this promotion discounts the cart is refused, and one already in the cart is taken out. The promotion's own code above still works."
+msgstr "קופון של החנות שמוזן בזמן שהמבצע הזה מוריד מחיר בעגלה יידחה, וקופון שכבר נמצא בעגלה יוסר. קוד הקופון של המבצע עצמו (למעלה) ימשיך לעבוד."
+
+#. translators: %s: promotion name.
+msgid "%s cannot be combined with coupons."
+msgstr "לא ניתן לשלב את %s עם קופונים."

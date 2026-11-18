@@ -138,6 +138,15 @@ $product_options = function ( $ids ) {
 				<span class="description"><?php esc_html_e( 'The promotion applies only when the customer enters this code at the cart or checkout.', 'promotion-engine' ); ?></span>
 			</p>
 
+			<label class="promeng-row promeng-toggle-row">
+				<span class="promeng-switch">
+					<input type="checkbox" name="block_coupons" value="1" <?php checked( (bool) $promotion->get( 'block_coupons', false ) ); ?> <?php echo esc_attr( $disabled ); ?>>
+					<span class="promeng-slider"></span>
+				</span>
+				<span><?php esc_html_e( 'No coupons while this promotion applies', 'promotion-engine' ); ?></span>
+			</label>
+			<p class="description"><?php esc_html_e( 'A store coupon entered while this promotion discounts the cart is refused, and one already in the cart is taken out. The promotion\'s own code above still works.', 'promotion-engine' ); ?></p>
+
 			<?php if ( \PromoEngine\Influencer::is_active() ) : ?>
 				<?php
 				$promeng_inf       = \PromoEngine\Influencer::assignment( $promotion );

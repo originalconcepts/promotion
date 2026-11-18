@@ -416,6 +416,9 @@ class Admin {
 			);
 		}
 
+		// Coupons may be shut out while this promotion discounts the cart (any type).
+		$config['block_coupons'] = ! empty( $post['block_coupons'] );
+
 		// Influencer assignment (when the OC Influencer Dashboard plugin is active).
 		if ( Influencer::is_active() && ! empty( $post['requires_coupon'] ) ) {
 			$config[ Influencer::CFG_USER ]   = isset( $post['influencer_user_id'] ) ? (int) $post['influencer_user_id'] : 0;

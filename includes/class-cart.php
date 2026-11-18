@@ -107,6 +107,9 @@ class Cart {
 		// For our "unlock token" coupons, show the real engine savings (not ₪0).
 		add_filter( 'woocommerce_cart_totals_coupon_html', array( $this, 'coupon_savings_html' ), 10, 3 );
 
+		// A promotion marked "no coupons" refuses store coupons while it discounts the cart.
+		add_filter( 'woocommerce_coupon_is_valid', array( $this, 'refuse_coupons_alongside' ), 20, 2 );
+
 		// Auto-add free gifts: keep them in sync with cart lifecycle events.
 		add_action( 'woocommerce_cart_loaded_from_session', array( $this, 'sync_auto_gifts' ), 20 );
 		add_action( 'woocommerce_add_to_cart', array( $this, 'sync_auto_gifts' ), 20 );
@@ -1013,6 +1016,53 @@ class Cart {
 			$name .= ' <span class="promeng-gift-badge">' . esc_html__( 'Free gift', 'promotion-engine' ) . '</span>';
 		}
 		return $name;
+	}
+
+	/**
+	 * A store coupon is refused while a promotion marked "no coupons" (config
+	 * block_coupons) is discounting the cart: a site-wide sale should not
+	 * stack with the welcome code. WooCommerce asks this both when the code is
+	 * entered and when the cart is checked again, so a coupon applied before
+	 * the sale began is taken out with the same message. The codes of the
+	 * plugin's own coupon-required promotions are never refused here.
+	 *
+	 * @param bool       $valid  Valid so far.
+	 * @param \WC_Coupon $coupon The coupon.
+	 * @return bool
+	 * @throws \Exception With the reason, which WooCommerce shows the shopper.
+	 */
+	public function refuse_coupons_alongside( $valid, $coupon ) {
+		if ( ! $valid || ! $coupon instanceof \WC_Coupon || ! function_exists( 'WC' ) || ! WC()->cart instanceof \WC_Cart || WC()->cart->is_empty() ) {
+			return $valid;
+		}
+
+		$code = strtolower( (string) $coupon->get_code() );
+
+		foreach ( Repository::active() as $own ) {
+			if ( $own->requires_coupon && strtolower( (string) $own->coupon_code ) === $code ) {
+				return $valid;
+			}
+		}
+
+		list( $lines, $context ) = $this->snapshot( WC()->cart );
+		$eval                    = $this->engine->evaluate( $lines, $context );
+
+		foreach ( (array) $eval['applied'] as $info ) {
+			$promotion = isset( $info['promotion'] ) ? $info['promotion'] : null;
+
+			if ( $promotion instanceof Promotion && $promotion->get( 'block_coupons', false ) ) {
+				throw new \Exception(
+					sprintf(
+						/* translators: %s: promotion name. */
+						esc_html__( '%s cannot be combined with coupons.', 'promotion-engine' ),
+						esc_html( $promotion->name )
+					),
+					100
+				);
+			}
+		}
+
+		return $valid;
 	}
 
 	/**
