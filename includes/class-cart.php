@@ -97,6 +97,13 @@ class Cart {
 		add_action( 'woocommerce_checkout_create_order_line_item', array( $this, 'set_order_line_item_discount' ), 20, 4 );
 		add_action( 'woocommerce_checkout_create_order', array( $this, 'store_applied_on_order' ), 20, 2 );
 
+		// The line discounts as the order's discount, as a coupon's would be:
+		// gateways that charge from the line subtotals plus discount_total
+		// (PayPlus) otherwise charged the undiscounted amount.
+		add_action( 'woocommerce_checkout_create_order', array( __CLASS__, 'record_line_discount' ), 99 );
+		add_action( 'woocommerce_store_api_checkout_update_order_from_request', array( __CLASS__, 'record_line_discount' ), 99 );
+		add_action( 'woocommerce_before_pay_action', array( __CLASS__, 'record_line_discount_and_save' ), 1 );
+
 		add_action( 'woocommerce_order_status_processing', array( Usage::class, 'record_for_order' ) );
 		add_action( 'woocommerce_order_status_completed', array( Usage::class, 'record_for_order' ) );
 
@@ -1159,6 +1166,56 @@ class Cart {
 		return $out;
 	}
 
+
+	/**
+	 * Record the promotions' line discounts as the order's discount total.
+	 *
+	 * set_order_line_item_discount() leaves each discounted line with the
+	 * original price as its subtotal and the discounted one as its total,
+	 * which is how WooCommerce itemises a coupon. But at the checkout the
+	 * order's discount_total is copied from the cart, which holds no coupon,
+	 * so it stayed 0 — and a gateway that builds the charge from the line
+	 * subtotals plus a discount line made of discount_total (PayPlus) asked
+	 * the shopper for the undiscounted amount, though the order total was
+	 * right. Here the order's discount is made to cover what its lines
+	 * already show. A real coupon is already counted there, so it is never
+	 * added twice; nothing changes when the lines carry no discount.
+	 *
+	 * @param \WC_Order $order The order being created (saved by the caller).
+	 * @return bool Whether anything changed.
+	 */
+	public static function record_line_discount( $order ) {
+		if ( ! $order instanceof \WC_Order ) {
+			return false;
+		}
+		$discount = 0.0;
+		$tax      = 0.0;
+		foreach ( $order->get_items( 'line_item' ) as $item ) {
+			$discount += max( 0, (float) $item->get_subtotal() - (float) $item->get_total() );
+			$tax      += max( 0, (float) $item->get_subtotal_tax() - (float) $item->get_total_tax() );
+		}
+		$decimals = wc_get_price_decimals();
+		$discount = round( $discount, $decimals );
+		$tax      = round( $tax, $decimals );
+		if ( $discount <= (float) $order->get_discount_total() + 0.009 ) {
+			return false;
+		}
+		$order->set_discount_total( $discount );
+		$order->set_discount_tax( $tax );
+		return true;
+	}
+
+	/**
+	 * The same, for an unpaid order paid again from "pay for order": saved
+	 * before the gateway reads it.
+	 *
+	 * @param \WC_Order $order The order.
+	 */
+	public static function record_line_discount_and_save( $order ) {
+		if ( self::record_line_discount( $order ) ) {
+			$order->save();
+		}
+	}
 
 	public function store_applied_on_order( $order, $data ) {
 		$cart = WC()->cart;
